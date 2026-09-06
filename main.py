@@ -112,40 +112,70 @@ def get_person_imdb_id(person_id):
         return None
 
 
-def build_caption(details, profile_name, config):
-    title = details.get("title") or details.get("original_title")
-    year = (details.get("release_date") or "----")[:4]
-    rating = details.get("vote_average", 0)
-    genres = "، ".join(GENRE_FA.get(g["id"], g["name"]) for g in details.get("genres", []))
+def get_person_english_name(person_id):
+    try:
+        data = tmdb_get(f"person/{person_id}", {"language": "en-US"})
+        return data.get("name")
+    except requests.RequestException:
+        return None
 
-    director = ""
+
+def get_clean_poster_path(movie_id, fallback_poster_path):
+    """پوستر بین‌المللی (بدون متن ترجمه‌شده) را برمی‌گرداند، نه نسخه‌ی محلی‌سازی‌شده."""
+    try:
+        data = tmdb_get(f"movie/{movie_id}/images", {"include_image_language": "null,en"})
+        posters = data.get("posters", [])
+        for preferred_lang in (None, "en"):
+            for p in posters:
+                if p.get("iso_639_1") == preferred_lang:
+                    return p.get("file_path")
+        if posters:
+            return posters[0].get("file_path")
+    except requests.RequestException:
+        pass
+    return fallback_poster_path
+
+
+def build_caption(details_fa, details_en, profile_name, config):
+    title_fa = details_fa.get("title") or details_fa.get("original_title")
+    title_en = details_en.get("title") or details_en.get("original_title")
+    year = (details_fa.get("release_date") or details_en.get("release_date") or "----")[:4]
+    rating = details_fa.get("vote_average", 0)
+    genres = "، ".join(GENRE_FA.get(g["id"], g["name"]) for g in details_fa.get("genres", []))
+
+    director_fa = ""
     director_person_id = None
-    for member in details.get("credits", {}).get("crew", []):
+    for member in details_fa.get("credits", {}).get("crew", []):
         if member.get("job") == "Director":
-            director = member.get("name")
+            director_fa = member.get("name")
             director_person_id = member.get("id")
             break
 
     director_line = ""
-    if director:
+    if director_fa:
+        director_en = get_person_english_name(director_person_id) if director_person_id else None
+        director_display = f"{director_fa} / {director_en}" if director_en and director_en != director_fa else director_fa
+
         director_imdb_id = get_person_imdb_id(director_person_id) if director_person_id else None
         if director_imdb_id:
             director_line = (
-                f"🎬 کارگردان: <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director}</a>"
+                f"🎬 کارگردان: <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director_display}</a>"
             )
         else:
-            director_line = f"🎬 کارگردان: {director}"
+            director_line = f"🎬 کارگردان: {director_display}"
 
-    overview = details.get("overview") or ""
+    overview = details_fa.get("overview") or details_en.get("overview") or ""
     max_chars = config["posting"].get("overview_max_chars", 320)
     if len(overview) > max_chars:
         overview = textwrap.shorten(overview, width=max_chars, placeholder="…")
 
-    imdb_id = details.get("external_ids", {}).get("imdb_id")
+    imdb_id = details_fa.get("external_ids", {}).get("imdb_id") or details_en.get("external_ids", {}).get("imdb_id")
     imdb_link = f"https://www.imdb.com/title/{imdb_id}/" if imdb_id else None
 
+    title_display = f"{title_fa} / {title_en}" if title_en and title_en != title_fa else title_fa
+
     lines = [
-        f"🎬 <b>{title}</b> ({year})",
+        f"🎬 <b>{title_display}</b> ({year})",
         f"🗂 دسته: {profile_name}",
         f"⭐ امتیاز: {rating:.1f}/10",
     ]
@@ -205,22 +235,23 @@ def main():
         print("هیچ فیلم جدیدی با این پروفایل‌ها پیدا نشد (شاید همه قبلاً پابلیش شده‌اند).")
         sys.exit(0)
 
-    details = get_movie_details(movie["id"], language)
-    if not details.get("overview"):
-        details = get_movie_details(movie["id"], fallback_language)
+    details_fa = get_movie_details(movie["id"], language)
+    details_en = get_movie_details(movie["id"], fallback_language)
 
-    caption = build_caption(details, profile_name, config)
-    send_to_telegram(caption, details.get("poster_path"), config)
+    poster_path = get_clean_poster_path(movie["id"], details_en.get("poster_path") or details_fa.get("poster_path"))
+
+    caption = build_caption(details_fa, details_en, profile_name, config)
+    send_to_telegram(caption, poster_path, config)
 
     history["posted"].append({
         "id": movie["id"],
-        "title": details.get("title"),
+        "title": details_en.get("title") or details_fa.get("title"),
         "profile": profile_name,
         "posted_at": datetime.now(timezone.utc).isoformat(),
     })
     save_json(HISTORY_PATH, history)
 
-    print(f"منتشر شد: {details.get('title')} (پروفایل: {profile_name})")
+    print(f"منتشر شد: {details_en.get('title') or details_fa.get('title')} (پروفایل: {profile_name})")
 
 
 if __name__ == "__main__":
