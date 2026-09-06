@@ -3,7 +3,7 @@ name: Publish Random Movie
 on:
   schedule:
     # هر ۲ روز یکبار ساعت ۱۶:۳۰ UTC (تقریباً ۲۰:۰۰ به وقت تهران)
-    - cron: "30 16 */2 * *"
+    - cron: "30 16 * * *"
   workflow_dispatch: {}  # اجازه اجرای دستی از تب Actions برای تست
 
 permissions:
