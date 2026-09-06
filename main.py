@@ -96,6 +96,21 @@ def pick_movie(config, history_ids):
     return None, None
 
 
+LRI = "\u2066"  # Left-to-Right Isolate
+RLI = "\u2067"  # Right-to-Left Isolate
+PDI = "\u2069"  # Pop Directional Isolate
+
+
+def isolate_ltr(text):
+    """این بخش از متن را صرف‌نظر از متن اطرافش همیشه چپ‌به‌راست نمایش بده."""
+    return f"{LRI}{text}{PDI}" if text else text
+
+
+def isolate_rtl(text):
+    """این بخش از متن را صرف‌نظر از متن اطرافش همیشه راست‌به‌چپ نمایش بده."""
+    return f"{RLI}{text}{PDI}" if text else text
+
+
 def get_movie_details(movie_id, language):
     details = tmdb_get(f"movie/{movie_id}", {
         "language": language,
@@ -162,7 +177,11 @@ def build_caption(details_fa, details_en, profile_name, config):
     director_line = None
     if director_fa:
         director_en = get_person_english_name(director_person_id) if director_person_id else None
-        director_display = f"{director_fa} / {director_en}" if director_en and director_en != director_fa else director_fa
+        director_display = (
+            f"{isolate_rtl(director_fa)} / {isolate_ltr(director_en)}"
+            if director_en and director_en != director_fa
+            else director_fa
+        )
 
         director_imdb_id = get_person_imdb_id(director_person_id) if director_person_id else None
         if director_imdb_id:
@@ -180,7 +199,11 @@ def build_caption(details_fa, details_en, profile_name, config):
     imdb_id = details_fa.get("external_ids", {}).get("imdb_id") or details_en.get("external_ids", {}).get("imdb_id")
     imdb_link = f"https://www.imdb.com/title/{imdb_id}/" if imdb_id else None
 
-    title_display = f"{title_en} ({year}) / {title_fa}" if title_en and title_en != title_fa else f"{title_en or title_fa} ({year})"
+    title_display = (
+        f"{isolate_ltr(f'{title_en} ({year})')} / {isolate_rtl(title_fa)}"
+        if title_en and title_en != title_fa
+        else isolate_ltr(f"{title_en or title_fa} ({year})")
+    )
 
     footer = config["posting"].get("channel_footer")
 
