@@ -2,8 +2,12 @@ name: Publish Random Movie
 
 on:
   schedule:
-    # هر ۲ روز یکبار ساعت ۱۶:۳۰ UTC (تقریباً ۲۰:۰۰ به وقت تهران)
-    - cron: "30 16 * * *"
+    # هر روز ساعت ۱۰:۰۰ صبح به وقت تهران
+    - cron: "30 6 * * *"
+
+    # هر روز ساعت ۲۲:۰۰ شب به وقت تهران
+    - cron: "30 18 * * *"
+
   workflow_dispatch: {}  # اجازه اجرای دستی از تب Actions برای تست
 
 permissions:
@@ -12,6 +16,7 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
