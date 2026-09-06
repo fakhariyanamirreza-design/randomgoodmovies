@@ -1,0 +1,53 @@
+{
+  "_help": "هر آبجکت داخل profiles یک 'دسته' فیلمه. اسکریپت هر بار رندوم یکی از این پروفایل‌ها رو انتخاب می‌کنه و بعد داخلش یک فیلم رندوم پیدا می‌کنه. لیست پارامترهای مجاز TMDb Discover: https://developer.themoviedb.org/reference/discover-movie -- لیست کد ژانرها هم پایین همین فایل (تو کامنت README) هست.",
+
+  "profiles": [
+    {
+      "name": "شاهکارهای کلاسیک",
+      "with_genres": "18",
+      "vote_average_gte": 8.0,
+      "vote_count_gte": 2000,
+      "release_date_gte": "1970-01-01",
+      "release_date_lte": "1999-12-31"
+    },
+    {
+      "name": "اکشن مدرن پرامتیاز",
+      "with_genres": "28",
+      "vote_average_gte": 7.2,
+      "vote_count_gte": 1500,
+      "release_date_gte": "2012-01-01"
+    },
+    {
+      "name": "علمی-تخیلی نامتعارف",
+      "with_genres": "878",
+      "vote_average_gte": 7.0,
+      "vote_count_gte": 800
+    },
+    {
+      "name": "درام‌های جایزه‌گرفته",
+      "with_genres": "18",
+      "vote_average_gte": 7.5,
+      "vote_count_gte": 1000,
+      "release_date_gte": "2000-01-01"
+    },
+    {
+      "name": "کمدی‌های محبوب",
+      "with_genres": "35",
+      "vote_average_gte": 7.0,
+      "vote_count_gte": 1000
+    },
+    {
+      "name": "انیمیشن ماندگار",
+      "with_genres": "16",
+      "vote_average_gte": 7.5,
+      "vote_count_gte": 1000
+    }
+  ],
+
+  "posting": {
+    "telegram_parse_mode": "HTML",
+    "overview_max_chars": 320,
+    "language": "fa-IR",
+    "fallback_language": "en-US"
+  }
+}
