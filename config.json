@@ -47,7 +47,7 @@
     "overview_max_chars": 320,
     "language": "fa-IR",
     "fallback_language": "en-US",
-    "channel_footer": "📢 عضو کانال شو: @RandomGoodMovies",
+    "channel_footer": "📢 عضویت در کانال: @RandomGoodMovies",
     "caption_template": [
       "title_fa",
       "title_en",
