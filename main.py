@@ -96,21 +96,6 @@ def pick_movie(config, history_ids):
     return None, None
 
 
-LRI = "\u2066"  # Left-to-Right Isolate
-RLI = "\u2067"  # Right-to-Left Isolate
-PDI = "\u2069"  # Pop Directional Isolate
-
-
-def isolate_ltr(text):
-    """این بخش از متن را صرف‌نظر از متن اطرافش همیشه چپ‌به‌راست نمایش بده."""
-    return f"{LRI}{text}{PDI}" if text else text
-
-
-def isolate_rtl(text):
-    """این بخش از متن را صرف‌نظر از متن اطرافش همیشه راست‌به‌چپ نمایش بده."""
-    return f"{RLI}{text}{PDI}" if text else text
-
-
 def get_movie_details(movie_id, language):
     details = tmdb_get(f"movie/{movie_id}", {
         "language": language,
@@ -152,7 +137,9 @@ def get_clean_poster_path(movie_id, fallback_poster_path):
 
 
 DEFAULT_CAPTION_TEMPLATE = [
-    "title", "category", "rating", "genres", "director",
+    "title_fa", "title_en",
+    "blank", "category", "rating", "genres",
+    "blank", "director_fa", "director_en",
     "blank", "overview",
     "blank", "imdb_link",
     "blank", "footer",
@@ -174,22 +161,20 @@ def build_caption(details_fa, details_en, profile_name, config):
             director_person_id = member.get("id")
             break
 
-    director_line = None
-    if director_fa:
-        director_en = get_person_english_name(director_person_id) if director_person_id else None
-        director_display = (
-            f"{isolate_rtl(director_fa)} / {isolate_ltr(director_en)}"
-            if director_en and director_en != director_fa
-            else director_fa
-        )
+    director_en = get_person_english_name(director_person_id) if director_person_id else None
+    director_imdb_id = get_person_imdb_id(director_person_id) if director_person_id else None
 
-        director_imdb_id = get_person_imdb_id(director_person_id) if director_person_id else None
+    director_line_fa = f"🎬 کارگردان: {director_fa}" if director_fa else None
+
+    director_line_en = None
+    if director_en and director_en != director_fa:
         if director_imdb_id:
-            director_line = (
-                f"🎬 کارگردان: <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director_display}</a>"
-            )
+            director_line_en = f"↳ <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director_en}</a>"
         else:
-            director_line = f"🎬 کارگردان: {director_display}"
+            director_line_en = f"↳ {director_en}"
+    elif director_fa and director_imdb_id:
+        # اگه اسم انگلیسی جدا پیدا نشد، حداقل خود اسم فارسی رو لینک کن
+        director_line_fa = f"🎬 کارگردان: <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director_fa}</a>"
 
     overview = details_fa.get("overview") or details_en.get("overview") or ""
     max_chars = config["posting"].get("overview_max_chars", 320)
@@ -199,22 +184,20 @@ def build_caption(details_fa, details_en, profile_name, config):
     imdb_id = details_fa.get("external_ids", {}).get("imdb_id") or details_en.get("external_ids", {}).get("imdb_id")
     imdb_link = f"https://www.imdb.com/title/{imdb_id}/" if imdb_id else None
 
-    title_display = (
-        f"{isolate_ltr(f'{title_en} ({year})')} / {isolate_rtl(title_fa)}"
-        if title_en and title_en != title_fa
-        else isolate_ltr(f"{title_en or title_fa} ({year})")
-    )
-
     footer = config["posting"].get("channel_footer")
 
     # هر «بلاک» یک تکه از پیام است. اسم هرکدوم داخل caption_template در config.json
     # قابل استفاده‌ست تا ترتیب و فاصله‌ها رو خودت کنترل کنی، بدون نیاز به تغییر کد.
+    # توجه: title_fa/title_en و director_fa/director_en عمداً در دو بلاک/خط جدا نگه داشته شده‌اند
+    # تا فارسی و انگلیسی در یک خط قاطی نشوند (مشکل نمایش دوجهته/bidi).
     blocks = {
-        "title": f"🎬 <b>{title_display}</b>",
+        "title_fa": f"🎬 <b>{title_fa}</b> ({year})" if title_fa else None,
+        "title_en": f"↳ {title_en} ({year})" if title_en and title_en != title_fa else None,
         "category": f"🗂 دسته: {profile_name}",
         "rating": f"⭐ امتیاز: {rating:.1f}/10",
         "genres": f"🎭 ژانر: {genres}" if genres else None,
-        "director": director_line,
+        "director_fa": director_line_fa,
+        "director_en": director_line_en,
         "overview": f"📝 {overview}" if overview else None,
         "imdb_link": f"🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>" if imdb_link else None,
         "footer": footer if footer else None,
