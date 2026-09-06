@@ -13,33 +13,33 @@
     {
       "name": "اکشن مدرن پرامتیاز",
       "with_genres": "28",
-      "vote_average_gte": 7.2,
+      "vote_average_gte": 8.0,
       "vote_count_gte": 1500,
       "release_date_gte": "2012-01-01"
     },
     {
       "name": "علمی-تخیلی نامتعارف",
       "with_genres": "878",
-      "vote_average_gte": 7.0,
+      "vote_average_gte": 8.0,
       "vote_count_gte": 800
     },
     {
       "name": "درام‌های جایزه‌گرفته",
       "with_genres": "18",
-      "vote_average_gte": 7.5,
+      "vote_average_gte": 8.0,
       "vote_count_gte": 1000,
       "release_date_gte": "2000-01-01"
     },
     {
       "name": "کمدی‌های محبوب",
       "with_genres": "35",
-      "vote_average_gte": 7.0,
+      "vote_average_gte": 8.0,
       "vote_count_gte": 1000
     },
     {
       "name": "انیمیشن ماندگار",
       "with_genres": "16",
-      "vote_average_gte": 7.5,
+      "vote_average_gte": 8.0,
       "vote_count_gte": 1000
     }
   ],
@@ -48,6 +48,7 @@
     "telegram_parse_mode": "HTML",
     "overview_max_chars": 320,
     "language": "fa-IR",
-    "fallback_language": "en-US"
+    "fallback_language": "en-US",
+    "channel_footer": "📢 عضو کانال شو: @your_channel_username"
   }
 }
