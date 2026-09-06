@@ -48,20 +48,21 @@
     "language": "fa-IR",
     "fallback_language": "en-US",
     "channel_footer": "📢 عضو کانال شو: @RandomGoodMovies",
-    "caption_template": [
+        "caption_template": [
       "title",
-      "director",
-      "blank",
-      "rating",
       "blank",
       "category",
+      "rating",
       "genres",
+      "blank",
+      "director",
       "blank",
       "overview",
       "blank",
       "imdb_link",
       "blank",
       "footer"
+    ]
     ]
   }
 }
