@@ -1,0 +1,40 @@
+name: Publish Random Movie
+
+on:
+  schedule:
+    # هر ۲ روز یکبار ساعت ۱۶:۳۰ UTC (تقریباً ۲۰:۰۰ به وقت تهران)
+    - cron: "30 16 */2 * *"
+  workflow_dispatch: {}  # اجازه اجرای دستی از تب Actions برای تست
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run bot
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: python main.py
+
+      - name: Commit updated history
+        run: |
+          git config user.name "movie-bot"
+          git config user.email "movie-bot@users.noreply.github.com"
+          git add data/posted.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "history: به‌روزرسانی فیلم‌های منتشرشده [skip ci]"
+          git push
