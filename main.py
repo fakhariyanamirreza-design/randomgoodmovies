@@ -104,6 +104,14 @@ def get_movie_details(movie_id, language):
     return details
 
 
+def get_person_imdb_id(person_id):
+    try:
+        data = tmdb_get(f"person/{person_id}/external_ids")
+        return data.get("imdb_id")
+    except requests.RequestException:
+        return None
+
+
 def build_caption(details, profile_name, config):
     title = details.get("title") or details.get("original_title")
     year = (details.get("release_date") or "----")[:4]
@@ -111,10 +119,22 @@ def build_caption(details, profile_name, config):
     genres = "، ".join(GENRE_FA.get(g["id"], g["name"]) for g in details.get("genres", []))
 
     director = ""
+    director_person_id = None
     for member in details.get("credits", {}).get("crew", []):
         if member.get("job") == "Director":
             director = member.get("name")
+            director_person_id = member.get("id")
             break
+
+    director_line = ""
+    if director:
+        director_imdb_id = get_person_imdb_id(director_person_id) if director_person_id else None
+        if director_imdb_id:
+            director_line = (
+                f"🎬 کارگردان: <a href=\"https://www.imdb.com/name/{director_imdb_id}/\">{director}</a>"
+            )
+        else:
+            director_line = f"🎬 کارگردان: {director}"
 
     overview = details.get("overview") or ""
     max_chars = config["posting"].get("overview_max_chars", 320)
@@ -131,12 +151,16 @@ def build_caption(details, profile_name, config):
     ]
     if genres:
         lines.append(f"🎭 ژانر: {genres}")
-    if director:
-        lines.append(f"🎬 کارگردان: {director}")
+    if director_line:
+        lines.append(director_line)
     if overview:
         lines.append(f"\n📝 {overview}")
     if imdb_link:
         lines.append(f"\n🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>")
+
+    footer = config["posting"].get("channel_footer")
+    if footer:
+        lines.append(f"\n{footer}")
 
     return "\n".join(lines)
 
