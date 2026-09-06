@@ -1,6 +1,5 @@
 {
   "_help": "هر آبجکت داخل profiles یک 'دسته' فیلمه. اسکریپت هر بار رندوم یکی از این پروفایل‌ها رو انتخاب می‌کنه و بعد داخلش یک فیلم رندوم پیدا می‌کنه. لیست پارامترهای مجاز TMDb Discover: https://developer.themoviedb.org/reference/discover-movie -- لیست کد ژانرها هم پایین همین فایل (تو کامنت README) هست.",
-
   "profiles": [
     {
       "name": "شاهکارهای کلاسیک",
@@ -43,12 +42,26 @@
       "vote_count_gte": 1000
     }
   ],
-
   "posting": {
     "telegram_parse_mode": "HTML",
     "overview_max_chars": 320,
     "language": "fa-IR",
     "fallback_language": "en-US",
-    "channel_footer": "📢 عضو کانال شو: @RandomGoodMovies"
+    "channel_footer": "📢 عضو کانال شو: @RandomGoodMovies",
+    "caption_template": [
+      "title",
+      "director",
+      "blank",
+      "rating",
+      "blank",
+      "category",
+      "genres",
+      "blank",
+      "overview",
+      "blank",
+      "imdb_link",
+      "blank",
+      "footer"
+    ]
   }
 }
