@@ -7,6 +7,7 @@
 """
 
 import os
+import re
 import sys
 import json
 import random
@@ -30,6 +31,17 @@ GENRE_FA = {
     27: "ترسناک", 10402: "موزیکال", 9648: "معمایی", 10749: "عاشقانه",
     878: "علمی-تخیلی", 10770: "تلویزیونی", 53: "هیجان‌انگیز", 10752: "جنگی",
     37: "وسترن",
+}
+
+COUNTRY_FA = {
+    "US": "آمریکا", "GB": "بریتانیا", "FR": "فرانسه", "DE": "آلمان", "IT": "ایتالیا",
+    "JP": "ژاپن", "KR": "کره جنوبی", "CN": "چین", "IN": "هند", "CA": "کانادا",
+    "ES": "اسپانیا", "RU": "روسیه", "AU": "استرالیا", "BR": "برزیل", "MX": "مکزیک",
+    "IR": "ایران", "TR": "ترکیه", "SE": "سوئد", "NO": "نروژ", "DK": "دانمارک",
+    "NL": "هلند", "BE": "بلژیک", "CH": "سوئیس", "AT": "اتریش", "PL": "لهستان",
+    "HK": "هنگ‌کنگ", "TW": "تایوان", "TH": "تایلند", "NZ": "نیوزیلند", "IE": "ایرلند",
+    "AR": "آرژانتین", "PT": "پرتغال", "GR": "یونان", "EG": "مصر", "IL": "اسرائیل",
+    "SA": "عربستان سعودی", "AE": "امارات", "FI": "فنلاند", "CZ": "چک", "HU": "مجارستان",
 }
 
 
@@ -136,22 +148,66 @@ def get_clean_poster_path(movie_id):
     return None
 
 
+def get_movie_keywords(movie_id):
+    try:
+        data = tmdb_get(f"movie/{movie_id}/keywords")
+        return [k["name"] for k in data.get("keywords", [])]
+    except requests.RequestException:
+        return []
+
+
+def keywords_to_hashtags(keywords, limit=5):
+    hashtags = []
+    for name in keywords[:limit]:
+        cleaned = re.sub(r"[^\w\s]", "", name, flags=re.UNICODE).strip()
+        cleaned = re.sub(r"\s+", "_", cleaned)
+        if cleaned:
+            hashtags.append(f"#{cleaned}")
+    return " ".join(hashtags)
+
+
+def format_runtime_fa(minutes):
+    if not minutes:
+        return None
+    hours, mins = divmod(minutes, 60)
+    if hours and mins:
+        return f"{hours} ساعت و {mins} دقیقه"
+    if hours:
+        return f"{hours} ساعت"
+    return f"{mins} دقیقه"
+
+
+def get_countries_fa(details):
+    names = []
+    for c in details.get("production_countries", []):
+        code = c.get("iso_3166_1")
+        names.append(COUNTRY_FA.get(code, c.get("name")))
+    return names
+
+
 DEFAULT_CAPTION_TEMPLATE = [
     "title_fa", "title_en",
-    "blank", "category", "rating", "genres",
+    "tagline",
+    "blank", "category", "rating", "genres", "runtime", "country",
     "blank", "director_fa", "director_en",
     "blank", "overview",
     "blank", "imdb_link",
+    "blank", "keywords",
     "blank", "footer",
 ]
 
 
-def build_caption(details_fa, details_en, profile_name, config):
+def build_caption(details_fa, details_en, keywords, profile_name, config):
     title_fa = details_fa.get("title") or details_fa.get("original_title")
     title_en = details_en.get("title") or details_en.get("original_title")
     year = (details_fa.get("release_date") or details_en.get("release_date") or "----")[:4]
     rating = details_fa.get("vote_average", 0)
     genres = "، ".join(GENRE_FA.get(g["id"], g["name"]) for g in details_fa.get("genres", []))
+
+    tagline = details_fa.get("tagline") or details_en.get("tagline") or ""
+    runtime_text = format_runtime_fa(details_fa.get("runtime") or details_en.get("runtime"))
+    countries_fa = get_countries_fa(details_fa) or get_countries_fa(details_en)
+    hashtags = keywords_to_hashtags(keywords)
 
     director_fa = ""
     director_person_id = None
@@ -193,13 +249,17 @@ def build_caption(details_fa, details_en, profile_name, config):
     blocks = {
         "title_fa": f"🎬 <b>{title_fa}</b> ({year})" if title_fa else None,
         "title_en": f"↳ {title_en} ({year})" if title_en and title_en != title_fa else None,
+        "tagline": f"💬 «{tagline}»" if tagline else None,
         "category": f"🗂 دسته: {profile_name}",
         "rating": f"⭐ امتیاز: {rating:.1f}/10",
         "genres": f"🎭 ژانر: {genres}" if genres else None,
+        "runtime": f"⏱ مدت‌زمان: {runtime_text}" if runtime_text else None,
+        "country": f"🌍 کشور سازنده: {'، '.join(countries_fa)}" if countries_fa else None,
         "director_fa": director_line_fa,
         "director_en": director_line_en,
         "overview": f"📝 {overview}" if overview else None,
         "imdb_link": f"🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>" if imdb_link else None,
+        "keywords": hashtags if hashtags else None,
         "footer": footer if footer else None,
     }
 
@@ -282,7 +342,9 @@ def main():
         or get_clean_poster_path(movie["id"])
     )
 
-    caption = build_caption(details_fa, details_en, profile_name, config)
+    keywords = get_movie_keywords(movie["id"])
+
+    caption = build_caption(details_fa, details_en, keywords, profile_name, config)
     send_to_telegram(caption, poster_path, config)
 
     history["posted"].append({
