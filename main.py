@@ -252,12 +252,26 @@ def main():
     language = config["posting"].get("language", "fa-IR")
     fallback_language = config["posting"].get("fallback_language", "en-US")
 
-    movie, profile_name = pick_movie(config, history_ids)
+    movie = None
+    profile_name = None
+    details_fa = None
+    excluded_ids = set(history_ids)
+
+    for _ in range(6):  # حداکثر ۶ بار تلاش برای پیدا کردن فیلمی با ترجمه‌ی فارسی معتبر
+        candidate, candidate_profile = pick_movie(config, excluded_ids)
+        if not candidate:
+            break
+        candidate_details_fa = get_movie_details(candidate["id"], language)
+        if candidate_details_fa.get("overview"):
+            movie, profile_name, details_fa = candidate, candidate_profile, candidate_details_fa
+            break
+        # این فیلم ترجمه‌ی فارسی نداشت؛ برای این دور کنارش بگذار و یکی دیگه امتحان کن
+        excluded_ids.add(candidate["id"])
+
     if not movie:
-        print("هیچ فیلم جدیدی با این پروفایل‌ها پیدا نشد (شاید همه قبلاً پابلیش شده‌اند).")
+        print("هیچ فیلمی با خلاصه‌داستان فارسی معتبر پیدا نشد (شاید همه قبلاً پابلیش شده‌اند یا ترجمه ندارند).")
         sys.exit(0)
 
-    details_fa = get_movie_details(movie["id"], language)
     details_en = get_movie_details(movie["id"], fallback_language)
 
     # اولویت با پوستر رسمی خودِ TMDb (همون که در صفحه‌ی خود فیلم هم دیده می‌شود).
