@@ -5,6 +5,41 @@ import random
 from .common import country_names_fa
 
 
+def _best_poster_from_images(data):
+    """بهترین/اصلی‌ترین پوستر انگلیسی از پاسخ movie/images.
+
+    اولویت با پوستری است که بیشترین رأی کاربران TMDb را دارد (vote_count) چون همان
+    «پوستر اصلی» است؛ در صورت تساوی رتبه‌ی vote_average و سپس ترتیب خود API در نظر
+    گرفته می‌شود. `include_image_language=null,en` پوسترهای محلی‌سازی‌شده را بیرون می‌اندازد.
+    """
+    posters = data.get("posters") or []
+    if not posters:
+        return None
+    best = max(
+        posters,
+        key=lambda p: (p.get("vote_count", 0), p.get("vote_average", 0)),
+    )
+    return best.get("file_path")
+
+
+def pick_poster(details_fa, details_en, images_data=None):
+    """انتخاب پوستر اصلی فیلم، دقیقاً همان که در TMDb/IMDb دیده می‌شود.
+
+    ترتیب اولویت:
+      1. پوستر en-US فراهم‌شده در movie/details (پوستر اصلی TMDb)
+      2. بهترین پوستر انگلیسی از images endpoint (fallback با کیفیت بالا)
+      3. پوستر فارسی/محلی‌سازی‌شده (فقط آخرین راه، چون ممکن است نسخه‌ی منطقه‌ای باشد)
+    """
+    en = details_en.get("poster_path")
+    if en:
+        return en
+    if images_data is not None:
+        cleaned = _best_poster_from_images(images_data)
+        if cleaned:
+            return cleaned
+    return details_fa.get("poster_path")
+
+
 def _extract_era(year, decade_brackets):
     if not year:
         return None
@@ -66,16 +101,20 @@ class CandidateDiscovery:
         self.decade_brackets = config.get("eras", [])
         self.published_ids = {item.get("id") for item in history.get("posted", []) if item.get("id") is not None}
 
-    def _clean_poster(self, movie_id):
+    def _resolve_poster(self, movie_id, details_fa, details_en):
+        """پوستر اصلی؛ اولویت en canonical، سپس best english از images، و فقط در آخر fa محلی.
+
+        وقتی پوستر en وجود دارد درخواست اضافه به images نمی‌شود؛ ولی اگر فقط fa (محلی/
+        منطقه‌ای) داریم، حتماً images را امتحان می‌کنیم تا پوستر اصلیِ بین‌المللی برنده شود.
+        """
+        en = details_en.get("poster_path")
+        if en:
+            return en
         try:
-            data = self.client.movie_images(movie_id)
-            posters = data.get("posters", [])
-            if posters:
-                best = max(posters, key=lambda p: p.get("vote_average", 0))
-                return best.get("file_path")
+            images_data = self.client.movie_images(movie_id)
         except Exception:
-            pass
-        return None
+            images_data = None
+        return pick_poster(details_fa, details_en, images_data)
 
     def discover(self):
         """برمی‌گرداند: (candidates, excluded_no_fa, stats)."""
@@ -153,7 +192,7 @@ class CandidateDiscovery:
                     profile_name, profile, list_movie, details_fa, details_en,
                     yaer_fallback=list_movie.get("release_date", ""),
                     director=director, imdb_id=imdb_id,
-                    poster_path=details_fa.get("poster_path") or details_en.get("poster_path") or self._clean_poster(mid),
+                    poster_path=self._resolve_poster(mid, details_fa, details_en),
                 )
                 cand["era"] = _extract_era(cand["year"], self.decade_brackets)
                 candidates.append(cand)
