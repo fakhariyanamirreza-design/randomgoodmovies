@@ -1,5 +1,6 @@
 {
-  "_help": "هر آبجکت داخل profiles یک 'دسته' فیلمه. اسکریپت هر بار رندوم یکی از این پروفایل‌ها رو انتخاب می‌کنه و بعد داخلش یک فیلم رندوم پیدا می‌کنه. لیست پارامترهای مجاز TMDb Discover: https://developer.themoviedb.org/reference/discover-movie -- لیست کد ژانرها هم پایین همین فایل (تو کامنت README) هست.",
+  "_help": "Autonomous Movie Content System - تمام تنظیمات قابل تغییر این‌جا قرار دارند. در این نسخه هیچ LLM یا سرویس پولی استفاده نمی‌شود؛ همه‌چیز rule-based و deterministic است.",
+
   "profiles": [
     {
       "name": "شاهکارهای کلاسیک",
@@ -12,57 +13,413 @@
     {
       "name": "اکشن مدرن پرامتیاز",
       "with_genres": "28",
-      "vote_average_gte": 8.0,
+      "vote_average_gte": 7.2,
       "vote_count_gte": 1500,
       "release_date_gte": "2012-01-01"
     },
     {
       "name": "علمی-تخیلی نامتعارف",
       "with_genres": "878",
-      "vote_average_gte": 8.0,
+      "vote_average_gte": 7.0,
       "vote_count_gte": 800
     },
     {
       "name": "درام‌های جایزه‌گرفته",
       "with_genres": "18",
-      "vote_average_gte": 8.0,
+      "vote_average_gte": 7.5,
       "vote_count_gte": 1000,
       "release_date_gte": "2000-01-01"
     },
     {
       "name": "کمدی‌های محبوب",
       "with_genres": "35",
-      "vote_average_gte": 8.0,
+      "vote_average_gte": 7.0,
       "vote_count_gte": 1000
     },
     {
       "name": "انیمیشن ماندگار",
       "with_genres": "16",
-      "vote_average_gte": 8.0,
+      "vote_average_gte": 7.5,
       "vote_count_gte": 1000
     }
   ],
+
   "posting": {
     "telegram_parse_mode": "HTML",
     "overview_max_chars": 320,
     "language": "fa-IR",
     "fallback_language": "en-US",
     "channel_footer": "📢 عضویت در کانال: @RandomGoodMovies",
-    "caption_template": [
-      "title_fa", "title_en",
-      "tagline",
-      "blank",
-      "category", "rating", "genres", "runtime", "country",
-      "blank",
-      "director_fa", "director_en",
-      "blank",
-      "overview",
-      "blank",
-      "imdb_link",
-      "blank",
-      "keywords",
-      "blank",
-      "footer"
-    ]
+    "verify_thumbnail_url": false,
+    "dry_run": false
+  },
+
+  "candidate_pool": {
+    "target_per_profile": 8,
+    "max_pages_per_profile": 3,
+    "max_pages_total": 12,
+    "exclude_adult": "false",
+    "sort_by": "popularity.desc",
+    "page_size": 20
+  },
+
+  "scoring": {
+    "_help": "امتیاز نهایی = مجموع (سهم هر معیار). هر معیار باید بین 0 تا max رسیده شود و سهمش در max ضرب می‌شود. وزن‌ها باید بین 0 و 1 باشند و مجموعشان 1 شود.",
+    "weights": {
+      "quality": 0.30,
+      "novelty": 0.15,
+      "category_diversity": 0.10,
+      "genre_diversity": 0.10,
+      "director_diversity": 0.10,
+      "era_diversity": 0.08,
+      "popularity": 0.10,
+      "surprise": 0.07
+    },
+    "quality_max": 100,
+    "quality_vote_count_reference": 5000,
+    "rating_reference_max": 10,
+    "popularity_max": 100,
+    "popularity_reference": 100,
+    "surprise_vote_count_threshold": 3000
+  },
+
+  "weighted_selection": {
+    "_help": "به‌جای همیشه انتخاب بالاترین امتیاز، از Top-N با احتمال وزن‌دار بر اساس امتیاز انتخاب می‌شود تا تنوع حفظ شود.",
+    "enabled": true,
+    "top_n": 3,
+    "temperature": 1.2
+  },
+
+  "diversity": {
+    "_help": "محدودیت‌های انعطاف‌پذیر انتخاب نهایی و پنجره‌های تاریخچه. hard_limit ها اول اعمال می‌شوند؛ اگر هیچ فیلمی باقی نماند soft_limit ها اعمال می‌شوند.",
+    "history_window": 10,
+    "recent_window": 5,
+    "category": {
+      "hard_limit": 2,
+      "soft_limit": 1,
+      "max_consecutive": 2
+    },
+    "genre": {
+      "hard_limit": 3,
+      "soft_limit": 2,
+      "max_consecutive": 3
+    },
+    "director": {
+      "hard_limit": 2,
+      "soft_limit": 1,
+      "max_consecutive": 2
+    },
+    "era": {
+      "hard_limit": 4,
+      "soft_limit": 2,
+      "max_consecutive": 4
     }
+  },
+
+  "angles": {
+    "_help": "هر angle یک قانون rule-based برای انتخاب و یک‌یاچند الگو (template) برای تولید کپشن دارد.",
+    "priority": [
+      "highly_rated",
+      "hidden_gem",
+      "director_spotlight",
+      "award_recognition",
+      "modern_classic",
+      "classic_recommendation",
+      "short_runtime",
+      "influential_film",
+      "decade_recommendation",
+      "genre_recommendation",
+      "weekend_recommendation"
+    ],
+    "rules": {
+      "highly_rated": {
+        "min_rating": 8.3,
+        "min_vote_count": 3000
+      },
+      "hidden_gem": {
+        "min_rating": 8.0,
+        "max_vote_count": 3000
+      },
+      "director_spotlight": {
+        "min_rating": 7.8,
+        "known_director_film_count": 5
+      },
+      "award_recognition": {
+        "known_awards_exist": true,
+        "award_keywords": [
+          "oscar", "academy award", "cannes", "palme d'or", "bafta",
+          "golden globe", "venice", "berlinale", "grand prix", "academy award winner"
+        ]
+      },
+      "modern_classic": {
+        "min_rating": 8.0,
+        "min_year": 1995
+      },
+      "classic_recommendation": {
+        "max_year": 1994
+      },
+      "short_runtime": {
+        "max_runtime": 100
+      },
+      "influential_film": {
+        "min_vote_count": 2000,
+        "min_popularity": 20
+      },
+      "decade_recommendation": {
+        "min_rating": 7.8
+      },
+      "genre_recommendation": {
+        "min_rating": 7.8
+      },
+      "weekend_recommendation": {
+        "min_rating": 7.5
+      }
+    },
+    "default_angle": "genre_recommendation"
+  },
+
+  "content": {
+    "_help": "الگوهای هر angle. هر مورد یا 'خط' است یا یک کلید بلاک. 'blank' خط خالی. کلیدهای بلاک: title_fa,title_en,tagline,category,rating,genres,runtime,country,director_fa,director_en,overview,imdb_link,hashtags,footer.",
+    "max_caption_chars": 1024,
+    "templates": {
+      "highly_rated": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_highly_rated",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "hidden_gem": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_hidden_gem",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "director_spotlight": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_director_spotlight",
+        "blank",
+        "category", "rating", "genres", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "award_recognition": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_award_recognition",
+        "blank",
+        "category", "rating", "genres", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "modern_classic": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_modern_classic",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "classic_recommendation": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_classic_recommendation",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "short_runtime": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_short_runtime",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "influential_film": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_influential_film",
+        "blank",
+        "category", "rating", "genres", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "decade_recommendation": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_decade_recommendation",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "genre_recommendation": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_genre_recommendation",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ],
+      "weekend_recommendation": [
+        "title_fa", "title_en",
+        "blank",
+        "lead_weekend_recommendation",
+        "blank",
+        "category", "rating", "genres", "runtime", "country",
+        "blank",
+        "director_fa", "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "imdb_link",
+        "blank",
+        "hashtags",
+        "blank",
+        "footer"
+      ]
+    },
+    "block_template": {
+      "title_fa": "🎬 <b>{title_fa}</b> ({year})",
+      "title_en": "↳ {title_en} ({year})",
+      "tagline": "💬 «{tagline}»",
+      "category": "🗂 دسته: {category}",
+      "rating": "⭐ امتیاز: {rating}/10",
+      "genres": "🎭 ژانر: {genres}",
+      "runtime": "⏱ مدت‌زمان: {runtime}",
+      "country": "🌍 کشور سازنده: {country}",
+      "director_fa": "🎬 کارگردان: {director_fa}",
+      "director_en": "↳ {director_en}",
+      "overview": "📝 {overview}",
+      "imdb_link": "🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>",
+      "hashtags": "{hashtags}",
+      "footer": "{footer}",
+      "lead_highly_rated": "یکی از فیلم‌های بسیار پرامتیاز سینما با امتیاز {rating}/10.",
+      "lead_hidden_gem": "اگر دنبال فیلمی هستی که احتمالاً کمتر دیده‌ای اما ارزش دیدن دارد، این انتخاب ماست.",
+      "lead_director_spotlight": "یک فیلم از {director_fa} — کارگردانی که کمتر کسی می‌تواند مثل او قصه تعریف کند.",
+      "lead_award_recognition": "فیلمی که در جشنواره‌ها و جوایز سینمایی درخشیده است.",
+      "lead_modern_classic": "یک اثر مدرن که به‌سرعت به یکی از کلاسیک‌های سینما تبدیل شد.",
+      "lead_classic_recommendation": "یک کلاسیک ماندگار که هر عاشق سینما باید دیده باشد.",
+      "lead_short_runtime": "یک فیلم کوتاه‌مدت اما پرنیرو — مناسب یک نشست کوتاه و مفید.",
+      "lead_influential_film": "فیلمی که روی نسل‌های بعدی سینما تأثیر گذاشته است.",
+      "lead_decade_recommendation": "یک پیشنهاد ویژه از فیلم‌های شاخص این دهه.",
+      "lead_genre_recommendation": "یک پیشنهاد بر اساس ژانر — تماشای آن را از دست نده.",
+      "lead_weekend_recommendation": "یک انتخاب عالی برای تعطیلات آخر هفته."
+    }
+  },
+
+  "quality_gate": {
+    "require_overview": true,
+    "require_poster": true,
+    "require_rating": true,
+    "min_rating": 6.0,
+    "require_imdb_when_available": false,
+    "max_caption_chars": 1024
+  },
+
+  "publisher": {
+    "photo_size": "w1280",
+    "timeout_seconds": 30,
+    "max_retries": 2,
+    "rate_limit_sleep_seconds": 1.0
+  },
+
+  "tmdb": {
+    "base_url": "https://api.themoviedb.org/3",
+    "request_timeout": 20,
+    "max_retries": 2,
+    "retry_backoff_seconds": 2.0,
+    "rate_limit_sleep_seconds": 0.3
+  }
 }
