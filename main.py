@@ -120,20 +120,20 @@ def get_person_english_name(person_id):
         return None
 
 
-def get_clean_poster_path(movie_id, fallback_poster_path):
-    """پوستر بین‌المللی (بدون متن ترجمه‌شده) را برمی‌گرداند، نه نسخه‌ی محلی‌سازی‌شده."""
+def get_clean_poster_path(movie_id):
+    """
+    پوستر رسمی/بین‌المللی فیلم را برمی‌گرداند (بر اساس بیشترین امتیاز کاربران TMDb)،
+    نه یک پوستر جایگزین با کیفیت پایین یا نسخه‌ی محلی‌سازی‌شده.
+    """
     try:
         data = tmdb_get(f"movie/{movie_id}/images", {"include_image_language": "null,en"})
         posters = data.get("posters", [])
-        for preferred_lang in (None, "en"):
-            for p in posters:
-                if p.get("iso_639_1") == preferred_lang:
-                    return p.get("file_path")
         if posters:
-            return posters[0].get("file_path")
+            best = max(posters, key=lambda p: p.get("vote_average", 0))
+            return best.get("file_path")
     except requests.RequestException:
         pass
-    return fallback_poster_path
+    return None
 
 
 DEFAULT_CAPTION_TEMPLATE = [
@@ -260,7 +260,13 @@ def main():
     details_fa = get_movie_details(movie["id"], language)
     details_en = get_movie_details(movie["id"], fallback_language)
 
-    poster_path = get_clean_poster_path(movie["id"], details_en.get("poster_path") or details_fa.get("poster_path"))
+    # اولویت با پوستر رسمی خودِ TMDb (همون که در صفحه‌ی خود فیلم هم دیده می‌شود).
+    # فقط اگر این پوستر وجود نداشت، سراغ بهترین پوستر جایگزین می‌رویم.
+    poster_path = (
+        details_en.get("poster_path")
+        or details_fa.get("poster_path")
+        or get_clean_poster_path(movie["id"])
+    )
 
     caption = build_caption(details_fa, details_en, profile_name, config)
     send_to_telegram(caption, poster_path, config)
