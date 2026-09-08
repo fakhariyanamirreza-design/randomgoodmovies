@@ -51,6 +51,15 @@ class ScoringTests(unittest.TestCase):
         # سهم surprise برای فیلم کم‌شناخته‌شده بیشتر است (کیفیت بالا ولی رأی کم)
         self.assertGreater(b_ob.get("surprise", 0), b_fa.get("surprise", 0))
 
+    def test_trending_boost(self):
+        trending = make_candidate(tmdb_id=10, trending=True)
+        normal = make_candidate(tmdb_id=11, trending=False)
+        t_tr, b_tr = self.engine.score_one(trending)
+        t_no, b_no = self.engine.score_one(normal)
+        self.assertGreater(t_tr, t_no)
+        self.assertGreater(b_tr.get("trending", 0), 0)
+        self.assertEqual(b_no.get("trending", 0), 0)
+
     def test_ranked_sorted_desc(self):
         c1 = make_candidate(rating=9.0, vote_count=9000, tmdb_id=1, title_fa="A")
         c2 = make_candidate(rating=6.0, vote_count=50, tmdb_id=2, title_fa="B")

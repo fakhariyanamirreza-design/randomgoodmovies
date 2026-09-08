@@ -89,6 +89,32 @@ class ContentBuilderTests(unittest.TestCase):
                                      similar=[])
         self.assertNotIn("فیلم‌های شبیه به این", caption)
 
+    def test_trending_line_only_when_trending(self):
+        trending = make_candidate(rating=8.5, vote_count=4000, trending=True)
+        angle = self.angles.choose(trending, keywords=[])
+        caption = self.builder.build(trending, angle, [], director_en=None,
+                                     director_imdb_id=None)
+        self.assertIn("فیلم‌های ترند روز TMDb", caption)
+        self.assertIn("ترند", caption)
+
+        normal = make_candidate(rating=8.5, vote_count=4000, trending=False)
+        angle2 = self.angles.choose(normal, keywords=[])
+        cap2 = self.builder.build(normal, angle2, [], director_en=None,
+                                  director_imdb_id=None)
+        self.assertNotIn("فیلم‌های ترند روز TMDb", cap2)
+
+    def test_similar_header_is_bold_and_preceded_by_blank(self):
+        cand = make_candidate(title_fa="وردپرس")
+        angle = self.angles.choose(cand, keywords=[])
+        similar = [{"id": 1, "title": "Inception", "year": 2010}]
+        caption = self.builder.build(cand, angle, [], director_en=None,
+                                     director_imdb_id=None, similar=similar)
+        self.assertIn("<b>فیلم‌های شبیه به این:</b>", caption)
+        lines = caption.split("\n")
+        idx = next(i for i, l in enumerate(lines) if "فیلم‌های شبیه به این" in l)
+        self.assertEqual(lines[idx - 1], "")
+        self.assertEqual(lines[idx + 1], "• Inception (2010)")
+
     def test_empty_fields_are_skipped(self):
         cand = make_candidate(title_fa="", overview_fa="", runtime=None,
                               director=None, imdb_id=None, genres=[], genre_names_fa=[])

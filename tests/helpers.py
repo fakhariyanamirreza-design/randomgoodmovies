@@ -18,16 +18,20 @@ def base_config():
             "max_pages_per_profile": 2,
             "max_pages_total": 4,
         },
+        "trending": {
+            "enabled": False  # تست‌ها بدون شبکه
+        },
         "scoring": {
             "weights": {
-                "quality": 0.30,
+                "quality": 0.27,
                 "novelty": 0.15,
                 "category_diversity": 0.10,
                 "genre_diversity": 0.10,
                 "director_diversity": 0.10,
                 "era_diversity": 0.08,
-                "popularity": 0.10,
-                "surprise": 0.07,
+                "popularity": 0.09,
+                "surprise": 0.04,
+                "trending": 0.07,
             },
             "quality_max": 100,
             "quality_vote_count_reference": 5000,
@@ -51,12 +55,13 @@ def base_config():
         },
         "angles": {
             "priority": [
-                "highly_rated", "hidden_gem", "director_spotlight", "award_recognition",
+                "trending_now", "highly_rated", "hidden_gem", "director_spotlight", "award_recognition",
                 "modern_classic", "classic_recommendation", "short_runtime",
                 "influential_film", "decade_recommendation", "genre_recommendation",
                 "weekend_recommendation",
             ],
             "rules": {
+                "trending_now": {},
                 "highly_rated": {"min_rating": 8.3, "min_vote_count": 3000},
                 "hidden_gem": {"min_rating": 8.0, "max_vote_count": 3000},
                 "director_spotlight": {"min_rating": 7.8},
@@ -75,17 +80,24 @@ def base_config():
             "max_caption_chars": 1024,
             "include_keywords": True,
             "templates": {
-                "genre_recommendation": [
-                    "title_fa", "title_en", "blank", "tagline",
+                "trending_now": [
+                    "title_fa", "title_en", "blank", "tagline", "trending_line",
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
-                    "similar_movies", "blank", "imdb_link", "blank", "hashtags",
+                    "blank", "similar_movies", "blank", "imdb_link", "blank", "hashtags",
+                    "blank", "footer",
+                ],
+                "genre_recommendation": [
+                    "title_fa", "title_en", "blank", "tagline", "trending_line",
+                    "blank", "category", "rating", "genres", "runtime", "country",
+                    "blank", "director_fa", "director_en", "blank", "overview",
+                    "blank", "similar_movies", "blank", "imdb_link", "blank", "hashtags",
                     "blank", "footer",
                 ],
                 "hidden_gem": [
-                    "title_fa", "title_en", "blank", "tagline",
+                    "title_fa", "title_en", "blank", "tagline", "trending_line",
                     "blank", "rating", "genres", "blank", "overview",
-                    "similar_movies", "blank", "footer",
+                    "blank", "similar_movies", "blank", "footer",
                 ],
             },
             "block_template": {
@@ -103,7 +115,8 @@ def base_config():
                 "imdb_link": "🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>",
                 "hashtags": "{hashtags}",
                 "footer": "{footer}",
-                "similar_movies": "🎯 فیلم‌های شبیه به این:\n{similar_movies}",
+                "similar_movies": "🎯 <b>فیلم‌های شبیه به این:</b>\n{similar_movies}",
+                "trending_line": "{trending_line}",
             },
         },
         "quality_gate": {
@@ -148,6 +161,7 @@ def make_candidate(**overrides):
         "poster_path": "/abc.jpg",
         "era": "2010s",
         "tagline": "",
+        "trending": False,
         "countries_fa": ["کانادا"],
     }
     cand.update(overrides)

@@ -116,8 +116,61 @@ class CandidateDiscovery:
             images_data = None
         return pick_poster(details_fa, details_en, images_data)
 
+    def _finalize(self, list_movie, profile_name, profile, stats, candidates,
+                  excluded_no_fa, seen_ids, floors=None):
+        """Build نهایی یک کاندیدا از روی اطلاعات کامل؛ با فیلتر quality برای منبع ترند.
+
+        floors: (min_rating, min_vote_count) اختیاری — فقط برای فیلم‌های ترند.
+        """
+        mid = list_movie.get("id")
+        if mid in seen_ids:
+            return
+        seen_ids.add(mid)
+        try:
+            details_fa = self.client.movie_details(mid, self.language)
+            details_en = self.client.movie_details(mid, self.fallback_language)
+        except Exception:
+            return
+        if floors:
+            if float(details_fa.get("vote_average") or 0) < floors[0]:
+                stats["trending_skipped"] += 1
+                return
+            if int(details_fa.get("vote_count") or 0) < floors[1]:
+                stats["trending_skipped"] += 1
+                return
+
+        overview_fa = details_fa.get("overview") or ""
+        if not overview_fa:
+            stats["no_fa_overview"] += 1
+            excluded_no_fa.append(mid)
+            return
+        if mid in self.published_ids:
+            stats["already_published"] += 1
+            return
+
+        director = None
+        for member in details_fa.get("credits", {}).get("crew", []):
+            if member.get("job") == "Director":
+                director = member
+                break
+        imdb_id = details_fa.get("external_ids", {}).get("imdb_id") or details_en.get("external_ids", {}).get("imdb_id")
+
+        cand = build_candidate(
+            profile_name, profile, list_movie, details_fa, details_en,
+            yaer_fallback=list_movie.get("release_date", ""),
+            director=director, imdb_id=imdb_id,
+            poster_path=self._resolve_poster(mid, details_fa, details_en),
+        )
+        cand["era"] = _extract_era(cand["year"], self.decade_brackets)
+        cand["trending"] = mid in self.trending_ids
+        candidates.append(cand)
+
     def discover(self):
-        """برمی‌گرداند: (candidates, excluded_no_fa, stats)."""
+        """برمی‌گرداند: (candidates, excluded_no_fa, stats).
+
+        کاندیداها از (۱) پروفایل‌های config و (۲) فهرست ترندِ روز TMDb ساخته می‌شوند؛
+        هر کاندیدا برچسب `trending` می‌گیرد تا موتور امتیازدهی بتواند به ترندها وزن بدهد.
+        """
         profiles = self.cfg.get("profiles", [])
         target_per_profile = self.pool_cfg.get("target_per_profile", 8)
         max_pages_per_profile = self.pool_cfg.get("max_pages_per_profile", 3)
@@ -129,7 +182,20 @@ class CandidateDiscovery:
         excluded_no_fa = []  # candidates که overview فارسی ندارند
         seen_ids = set()
         total_pages_used = 0
-        stats = {"discovered": 0, "already_published": 0, "no_fa_overview": 0}
+        stats = {"discovered": 0, "already_published": 0, "no_fa_overview": 0,
+                 "trending_found": 0, "trending_skipped": 0}
+
+        trending_cfg = self.cfg.get("trending", {}) or {}
+        self.trending_ids = set()
+        if trending_cfg.get("enabled", True):
+            try:
+                self.trending_ids = set(self.client.trending(
+                    window=trending_cfg.get("window", "week"),
+                    limit=int(trending_cfg.get("limit", 12)),
+                ))
+            except Exception:
+                self.trending_ids = set()
+        stats["trending_found"] = len(self.trending_ids)
 
         for profile in profiles:
             profile_name = profile.get("name") or "نامشخص"
@@ -163,38 +229,20 @@ class CandidateDiscovery:
 
             # برای هر فیلم متادیتای کامل فارسی/انگلیسی بگیر
             for list_movie in gathered:
-                mid = list_movie.get("id")
-                if mid in seen_ids:
-                    continue
-                seen_ids.add(mid)
-                try:
-                    details_fa = self.client.movie_details(mid, self.language)
-                    details_en = self.client.movie_details(mid, self.fallback_language)
-                except Exception:
-                    continue
-                director = None
-                for member in details_fa.get("credits", {}).get("crew", []):
-                    if member.get("job") == "Director":
-                        director = member
-                        break
-                imdb_id = details_fa.get("external_ids", {}).get("imdb_id") or details_en.get("external_ids", {}).get("imdb_id")
+                self._finalize(list_movie, profile_name, profile, stats, candidates,
+                               excluded_no_fa, seen_ids)
 
-                overview_fa = details_fa.get("overview") or ""
-                if not overview_fa:
-                    stats["no_fa_overview"] += 1
-                    excluded_no_fa.append(mid)
-                    continue
-                if mid in self.published_ids:
-                    stats["already_published"] += 1
-                    continue
-
-                cand = build_candidate(
-                    profile_name, profile, list_movie, details_fa, details_en,
-                    yaer_fallback=list_movie.get("release_date", ""),
-                    director=director, imdb_id=imdb_id,
-                    poster_path=self._resolve_poster(mid, details_fa, details_en),
+        # فیلم‌های ترند روز: منبع اضافی برای هم‌پوشانی با حال‌وهوای روز
+        if trending_cfg.get("enabled", True):
+            floors = (float(trending_cfg.get("min_rating", 6.5)),
+                      int(trending_cfg.get("min_vote_count", 500)))
+            trend_profile = {"name": "ترند روز"}
+            for mid in sorted(self.trending_ids):
+                stats["discovered"] += 1
+                self._finalize(
+                    {"id": mid, "release_date": ""},
+                    "ترند روز", trend_profile, stats, candidates,
+                    excluded_no_fa, seen_ids, floors=floors,
                 )
-                cand["era"] = _extract_era(cand["year"], self.decade_brackets)
-                candidates.append(cand)
 
         return candidates, excluded_no_fa, stats

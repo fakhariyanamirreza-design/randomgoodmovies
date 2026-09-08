@@ -22,6 +22,7 @@ class TMDbClient:
         self.max_retries = cfg.get("max_retries", 2)
         self.backoff = cfg.get("retry_backoff_seconds", 2.0)
         self.rate_limit_sleep = cfg.get("rate_limit_sleep_seconds", 0.3)
+        self.cfg = cfg
 
     def _get(self, endpoint, params=None):
         params = dict(params or {})
@@ -75,8 +76,13 @@ class TMDbClient:
         data = self._get(f"movie/{movie_id}/keywords")
         return [k.get("name") for k in data.get("keywords", [])]
 
-    def movie_similar(self, movie_id, language="en-US", limit=3):
-        """۳ فیلم مشابه از /movie/{id}/similar (رایگان است).
+    def movie_similar(self, movie_id, genres=None, language="en-US", limit=3):
+        """۳ فیلم واقعاً مشابه از /movie/{id}/similar (رایگان است).
+
+        برای جلوگیری از پیشنهادهای عجیب (مثل مرد ماهیگیر برای پدرخوانده) فیلترهای ساده:
+         - وقتی genres فیلم اصلی داده شده، نتیجه باید حداقل یک ژانر مشترک داشته باشد.
+         - امتیاز و تعداد رأی کمتر از floor نباشد (پیشنهادهای کم‌اعتبار حذف شوند).
+        سپس بر اساس (تعداد ژانر مشترک، امتیاز، تعداد رأی) مرتب و top-limit برمی‌گردد.
 
         برمی‌گرداند: list[dict{id, title, year}] — در صورت خطا/خالی بودن [].
         """
@@ -84,8 +90,29 @@ class TMDbClient:
             data = self._get(f"movie/{movie_id}/similar", {"language": language})
         except TMDbError:
             return []
+        genres = set(genres or [])
+        min_rating = float(self.cfg.get("similar_min_rating", 6.0))
+        min_vote_count = int(self.cfg.get("similar_min_vote_count", 100))
+
+        def _overlap(item):
+            return len(genres & set(item.get("genre_ids") or []))
+
+        pool = []
+        for item in (data.get("results") or []):
+            if item.get("id") == movie_id:
+                continue
+            if genres and _overlap(item) == 0:
+                continue
+            if float(item.get("vote_average") or 0) < min_rating:
+                continue
+            if int(item.get("vote_count") or 0) < min_vote_count:
+                continue
+            pool.append(item)
+
+        pool.sort(key=lambda it: (_overlap(it), it.get("vote_average", 0), it.get("vote_count", 0)),
+                  reverse=True)
         out = []
-        for item in (data.get("results") or [])[:limit]:
+        for item in pool[:limit]:
             year = None
             rd = item.get("release_date") or ""
             try:
@@ -95,6 +122,17 @@ class TMDbClient:
                 year = None
             out.append({"id": item.get("id"), "title": item.get("title"), "year": year})
         return out
+
+    def trending(self, window="week", limit=15):
+        """فیلم‌های ترندِ حالِ حاضر TMDb (رایگان، بدون LLM) برای منبع اضافی کاندیدا.
+
+        برمی‌گرداند: list[int] از tmdb_id — در صورت خطا/خالی بودن [].
+        """
+        try:
+            data = self._get(f"trending/movie/{window}", {"language": "en-US"})
+        except TMDbError:
+            return []
+        return [m.get("id") for m in (data.get("results") or [])[:limit] if m.get("id")]
 
     def person_imdb_id(self, person_id):
         try:

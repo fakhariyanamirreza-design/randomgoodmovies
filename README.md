@@ -15,7 +15,7 @@
 ```
 Discover           → ساخت Candidate Pool از پروفایل‌های config (با metadata کامل)
 Filter             → حذف فیلم‌های منتشرشده + فیلم‌های بدون خلاصه‌ی فارسی
-Score              → امتیازدهی editorial بر اساس ۸ معیار وزن‌دار
+Score              → امتیازدهی editorial بر اساس ۹ معیار وزن‌دار
 Analyze History    → توزیع ژانر/کارگردان/دهه/دسته از حافظه
 Select             → قوانین تنوع (hard/soft limit) + انتخاب وزن‌دار از Top-N
 Choose Angle       → انتخاب زاویه‌ی سردبیری (Highly Rated، Hidden Gem و ...)
@@ -53,7 +53,7 @@ src/
 ├── persistence.py       # بارگذاری/ذخیره‌ی JSON + مهاجرت ورودی‌های قدیمی
 └── explain.py           # خروجی توضیح‌پذیر برای لاگ
 
-tests/                   # ۴۳ تست unittest (بدون نیاز به شبکه)
+tests/                   # ۶۳ تست unittest (بدون نیاز به شبکه)
 .github/workflows/publish.yml
 ```
 
@@ -65,14 +65,15 @@ tests/                   # ۴۳ تست unittest (بدون نیاز به شبکه
 
 | معیار | وزن پیش‌فرض | ایده |
 |---|---|---|
-| quality | 0.30 | rating و vote_count |
+| quality | 0.27 | rating و vote_count |
 | novelty | 0.15 | منتشرنشده بودن |
 | category_diversity | 0.10 | کمبود/اشباع دسته در پنجره‌ی اخیر |
 | genre_diversity | 0.10 | کمبود/اشباع ژانر |
 | director_diversity | 0.10 | تکرار کارگردان |
 | era_diversity | 0.08 | تعادل دهه‌ها |
-| popularity | 0.10 | جذابیت برای مخاطب (با سیری پذیری) |
-| surprise | 0.07 | کیفیت بالا ولی کمتر شناخته‌شده |
+| popularity | 0.09 | جذابیت برای مخاطب (با سیری پذیری) |
+| surprise | 0.04 | کیفیت بالا ولی کمتر شناخته‌شده |
+| trending | 0.07 | «ترند روز» بودن در TMDb (هم‌پوشانی با حال‌وهوای روز) |
 
 وزن‌ها و پارامترهای هر معیار در `config.json → scoring` هستند و بدون تغییر Python قابل تنظیم‌اند
 (مجموع وزن‌ها باید ۱ شود).
@@ -87,6 +88,19 @@ tests/                   # ۴۳ تست unittest (بدون نیاز به شبکه
 نماند، فقط `soft_limit` (کم‌ترین تخلف) اعمال می‌شود. در پایان، با
 `weighted_selection` (Top-N + temperature) انتخاب نهایی برای حفظ تنوع انجام می‌شود.
 
+## ترند روز (Trending)
+
+برای اینکه محتوا «تا حدی» با چیزی که الان جلوی چشم کاربران است هم‌پوشانی داشته باشد
+(رایگان و بدون LLM):
+
+- `config.json → trending`: فیلم‌های `/trending/movie/week` TMDb به‌عنوان **منبع اضافی
+  کاندیدا** وارد pool می‌شوند (فقط فیلم‌های با ریتینگ/رأی بالای آستانه).
+- هر کاندیدایی که در فهرست ترند باشد وزن `trending` (0.07) را در امتیاز می‌گیرد؛ چون
+  وزن کم است، صرفاً **شانس را بالا می‌برد** نه اینکه انتخاب را به سمت ترند سوگیری کامل دهد.
+- زاویه‌ی `trending_now` در صدر priority با دلیل «همین حالا جزو ترندهای روز است» ثبت می‌شود.
+- در کپشن، بلاک `trending_line` («🔥 همین حالا در فهرست فیلم‌های ترند روز TMDb است»)
+  فقط برای فیلم‌های ترند نمایش داده می‌شود.
+
 ## زاویه‌ی سردبیری
 
 `config.json → angles`:
@@ -94,9 +108,9 @@ tests/                   # ۴۳ تست unittest (بدون نیاز به شبکه
 - `rules`: شرایط هر angle (مثلاً «highly_rated» نیاز به rating≥8.3 و رأی≥3000)
 - `default_angle`: سقوط اگر هیچ قانونی جور نبود
 
-زاویه‌ها: highly_rated، hidden_gem، director_spotlight، award_recognition، modern_classic،
-classic_recommendation، short_runtime، influential_film، decade_recommendation،
-genre_recommendation، weekend_recommendation.
+زاویه‌ها: trending_now، highly_rated، hidden_gem، director_spotlight، award_recognition،
+modern_classic، classic_recommendation، short_runtime، influential_film،
+decade_recommendation، genre_recommendation، weekend_recommendation.
 
 ## پوستر اصلی فیلم
 
@@ -120,7 +134,11 @@ genre_recommendation، weekend_recommendation.
 قالب هر پست (پس از عنوان) به این شکل است:
 
 - `tagline`: اسلوگان فیلم از TMDb (اگر باشد) — به‌جای جمله‌ی ثابتِ تکراری
+- `trending_line`: «همین حالا در ترند روز TMDb است» — فقط برای فیلم‌های ترند
 - `similar_movies`: ۳ فیلم مشابه از `/movie/{id}/similar` — بخش «فیلم‌های شبیه به این»
+  (هدر بُلد است و یک خط خالی قبلش دارد). برای جلوگیری از پیشنهادهای عجیب، فیلم مشابه
+  باید حداقل یک ژانر مشترک با فیلم اصلی داشته باشد و ریتینگ/رأیِ قابل‌قبول؛ مرتب‌سازی بر
+  اساس (تعداد ژانر مشترک، امتیاز، رأی).
 
 ## Quality Gate
 
@@ -164,7 +182,7 @@ python main.py
 python -m unittest discover -s tests
 ```
 
-بخش‌های deterministic (امتیاز، تنوع، حافظه، angle، کپشن، گیت کیفیت، duplicate) با ۴۳ تست
+بخش‌های deterministic (امتیاز، تنوع، حافظه، angle، کپشن، گیت کیفیت، duplicate) با ۶۳ تست
 بدون نیاز به شبکه پوشش داده شده‌اند.
 
 ---

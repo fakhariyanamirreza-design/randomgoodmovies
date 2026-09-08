@@ -62,11 +62,14 @@ class FakeTMDbClient:
     def movie_keywords(self, movie_id):
         return ["شناخته_شده", "cannes"]
 
-    def movie_similar(self, movie_id, language="en-US", limit=3):
+    def movie_similar(self, movie_id, genres=None, language="en-US", limit=3):
         return [
             {"id": 900, "title": f"Similar {movie_id} A", "year": 2009},
             {"id": 901, "title": f"Similar {movie_id} B", "year": 2015},
         ]
+
+    def trending(self, window="week", limit=15):
+        return []
 
     def person_english_name(self, person_id):
         return "Denis Villeneuve"

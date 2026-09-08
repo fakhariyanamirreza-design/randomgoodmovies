@@ -45,7 +45,12 @@ class AngleEngine:
             rule = self.rules.get(angle, {})
             reasons = []
             ok = True
-            if angle == "highly_rated":
+            if angle == "trending_now":
+                if not cand.get("trending"):
+                    ok = False
+                else:
+                    reasons.append("همین حالا جزو فیلم‌های ترند روز TMDb است")
+            elif angle == "highly_rated":
                 if _rating(cand) < rule.get("min_rating", 99):
                     ok = False
                 elif _vote_count(cand) < rule.get("min_vote_count", 0):

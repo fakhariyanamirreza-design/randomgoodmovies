@@ -108,5 +108,72 @@ class PosterTests(unittest.TestCase):
         self.assertEqual(result, "/fa.jpg")
 
 
+def test_trending_movies_added_to_pool_and_marked(self):
+        class TrendingClient:
+            def __init__(self):
+                self.added = 0
+
+            def discover(self, *a, **k):
+                return {"total_pages": 1, "results": []}
+
+            def trending(self, window="week", limit=15):
+                return [555]
+
+            def movie_details(self, movie_id, language):
+                if language != "fa-IR":
+                    return {"title": "EN", "poster_path": "/en.jpg", "overview": "x",
+                            "credits": {}, "external_ids": {"imdb_id": "tt555"},
+                            "genres": [], "release_date": "2010-01-01", "runtime": 120}
+                return {"title": "فیلم ترند", "poster_path": "/fa.jpg",
+                        "overview": "خلاصه فارسی ترند.", "vote_average": 7.5,
+                        "vote_count": 8000, "popularity": 50, "genres": [],
+                        "release_date": "2010-06-01", "runtime": 120}
+
+            def movie_images(self, movie_id):
+                return {"posters": [{"file_path": "/p.jpg"}]}
+
+        cfg = base_config()
+        cfg["trending"] = {"enabled": True, "limit": 5}
+        discovery = CandidateDiscovery(TrendingClient(), cfg, base_history())
+        cands, _ex, stats = discovery.discover()
+        self.assertEqual(stats["trending_found"], 1)
+        self.assertTrue(any(c["trending"] and c["profile"] == "ترند روز" for c in cands),
+                        "فیلم ترند باید به pool اضافه و tagged شود")
+
+
+class TrendingDiscoveryTests(unittest.TestCase):
+    def test_trending_movies_added_to_pool_and_marked(self):
+        class TrendingClient:
+            def __init__(self):
+                self.added = 0
+
+            def discover(self, *a, **k):
+                return {"total_pages": 1, "results": []}
+
+            def trending(self, window="week", limit=15):
+                return [555]
+
+            def movie_details(self, movie_id, language):
+                if language != "fa-IR":
+                    return {"title": "EN", "poster_path": "/en.jpg", "overview": "x",
+                            "credits": {}, "external_ids": {"imdb_id": "tt555"},
+                            "genres": [], "release_date": "2010-01-01", "runtime": 120}
+                return {"title": "فیلم ترند", "poster_path": "/fa.jpg",
+                        "overview": "خلاصه فارسی ترند.", "vote_average": 7.5,
+                        "vote_count": 8000, "popularity": 50, "genres": [],
+                        "release_date": "2010-06-01", "runtime": 120}
+
+            def movie_images(self, movie_id):
+                return {"posters": [{"file_path": "/p.jpg"}]}
+
+        cfg = base_config()
+        cfg["trending"] = {"enabled": True, "limit": 5}
+        discovery = CandidateDiscovery(TrendingClient(), cfg, base_history())
+        cands, _ex, stats = discovery.discover()
+        self.assertEqual(stats["trending_found"], 1)
+        self.assertTrue(any(c["trending"] and c["profile"] == "ترند روز" for c in cands),
+                        "فیلم ترند باید به pool اضافه و tagged شود")
+
+
 if __name__ == "__main__":
     unittest.main()

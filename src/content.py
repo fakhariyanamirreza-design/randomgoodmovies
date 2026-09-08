@@ -88,6 +88,7 @@ class ContentBuilder:
             "overview": overview,
             "imdb_link": imdb_link or "",
             "similar_movies": "\n".join(similar_lines),
+            "trending_line": "🔥 همین حالا در فهرست فیلم‌های ترند روز TMDb است" if cand.get("trending") else "",
             "hashtags": hashtags,
             "footer": self.cfg.get("posting", {}).get("channel_footer") or "",
         }
@@ -114,6 +115,7 @@ class ContentBuilder:
         "director_en": "director_en",
         "overview": "overview",
         "similar_movies": "similar_movies",
+        "trending_line": "trending_line",
         "imdb_link": "imdb_link",
         "hashtags": "hashtags",
         "footer": "footer",

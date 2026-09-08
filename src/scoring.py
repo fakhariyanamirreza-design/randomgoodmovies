@@ -90,6 +90,11 @@ def surprise_component(cand, cfg):
     return 0.0
 
 
+def trending_component(cand, _cfg):
+    """ترند بودن: اگر فیلم الان در فهرست ترند TMDb باشد سهم کامل، وگرنه 0 (بدون تاریخچه)."""
+    return 1.0 if cand.get("trending") else 0.0
+
+
 COMPONENTS = {
     "quality": quality_component,
     "novelty": novelty_component,
@@ -99,6 +104,7 @@ COMPONENTS = {
     "era_diversity": era_diversity_component,
     "popularity": popularity_component,
     "surprise": surprise_component,
+    "trending": trending_component,
 }
 
 DEFAULTS = {
@@ -108,6 +114,7 @@ DEFAULTS = {
     "popularity_max": 100,
     "popularity_reference": 100,
     "surprise_vote_count_threshold": 3000,
+    "trending_max": 100,
 }
 
 
@@ -122,7 +129,7 @@ class ScoringEngine:
         """امتیاز یک کاندیدا + تفکیک هر معیار (برای explainability)."""
         breakdown = {}
         total = 0.0
-        cfg_needing = {"quality", "popularity", "surprise"}
+        cfg_needing = {"quality", "popularity", "surprise", "trending"}
         for name, weight in self.weights.items():
             max_val = DEFAULTS.get(name + "_max", 100.0)
             func = COMPONENTS.get(name)

@@ -15,6 +15,12 @@ class AngleTests(unittest.TestCase):
         self.config = base_config()
         self.engine = AngleEngine(self.config)
 
+    def test_trending_now_when_trending(self):
+        cand = make_candidate(rating=7.0, vote_count=100, trending=True, year=2015)
+        result = self.engine.choose(cand, keywords=[])
+        self.assertEqual(result.angle, "trending_now")
+        self.assertTrue(len(result.reasons) > 0)
+
     def test_highly_rated_picked_for_quality(self):
         cand = make_candidate(rating=9.0, vote_count=5000, year=2010)
         result = self.engine.choose(cand, keywords=[])

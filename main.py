@@ -91,7 +91,7 @@ def build_attempt(client, angles, content, quality, cand):
         director_imdb_id = client.person_imdb_id(cand["director_id"])
 
     try:
-        similar = client.movie_similar(cand.get("tmdb_id"))
+        similar = client.movie_similar(cand.get("tmdb_id"), genres=cand.get("genres") or [])
     except Exception:
         similar = []
 
