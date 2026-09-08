@@ -232,6 +232,37 @@ class ContentBuilderTests(unittest.TestCase):
                                      director_imdb_id=None)
         self.assertLessEqual(len(caption), 1024)
 
+    def test_overflow_keeps_layout_and_blocks(self):
+        # کپشنی که ذاتاً از ۱۰۲۴ بیشتر باشد نباید flatten شود (مشکل پست 31)
+        cand = make_candidate(
+            overview_fa="ز" * 600,
+            tagline="A very long tagline about movies and storytelling " * 3,
+        )
+        angle = self.angles.choose(cand, keywords=[])
+        similar = [
+            {"id": 1, "title": "The Lord of the Rings: The Return of the King", "year": 2003},
+            {"id": 2, "title": "The Lord of the Rings: The Fellowship of the Ring", "year": 2001},
+            {"id": 3, "title": "The Lord of the Rings: The Two Towers", "year": 2002},
+        ]
+        caption = self.builder.build(cand, angle, [], director_en=None,
+                                     director_imdb_id=None, similar=similar)
+        self.assertLessEqual(len(caption), 1024)
+        self.assertIn("\n\n", caption, "خط خالی باید حفظ شود، نه این‌که همه‌چیز یک خط شود")
+        self.assertGreater(len(caption.split("\n")), 5)
+        self.assertIn("فیلم‌های شبیه به این", caption)
+        self.assertIn("#درام", caption)
+        self.assertIn("کانال تست", caption, "footer نباید با کوتاه‌کردن از بین برود")
+
+    # بلاک‌های جدید هم config-driven هستند: اگر قالب خالی/حذف شد هیچ بلاکی نشکند
+    def test_blocks_work_without_new_config_keys(self):
+        cfg = base_config()
+        builder = ContentBuilder(cfg)
+        cand = make_candidate()
+        angle = AngleEngine(cfg).choose(cand, keywords=[])
+        caption = builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("وردپرس", caption)
+        self.assertNotIn("{", caption, "هیچ جای‌گزینه‌ی باز باید بماند")
+
 
 if __name__ == "__main__":
     unittest.main()

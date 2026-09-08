@@ -16,6 +16,15 @@ def fa_digits(text):
     return "".join(FA_DIGITS[int(c)] if c.isdigit() else c for c in str(text))
 
 
+def _shorten(text, limit):
+    """کوتاه‌کردن یک متن بدون از بین‌بردن سطرها/ساختار؛ انتهایش «…» اضافه می‌شود."""
+    if limit <= 1:
+        return text[:limit]
+    if len(text) <= limit:
+        return text
+    return text[: limit - 1].rstrip() + "…"
+
+
 def _flag_emoji(iso):
     """پرچم کشور از کد دوحرفی ISO (مثلاً US → 🇺🇸)؛ بدون کد معتبر خالی."""
     if not iso or len(iso) != 2:
@@ -92,8 +101,7 @@ class ContentBuilder:
             hashtags = self._structured_hashtags(cand)
 
         overview = cand.get("overview_fa") or cand.get("overview_en") or ""
-        if len(overview) > self.overview_max_chars:
-            overview = textwrap.shorten(overview, width=self.overview_max_chars, placeholder="…")
+        overview = _shorten(overview, self.overview_max_chars)
 
         imdb_link = None
         if cand.get("imdb_id"):
@@ -209,16 +217,7 @@ class ContentBuilder:
         "footer": "footer",
     }
 
-    def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None,
-              similar=None, reasons=None):
-        angle = angle_decision.angle
-        template = (self.templates.get(angle)
-                    or self.templates.get(self.default_template)
-                    or self.templates.get("genre_recommendation")
-                    or [])
-        values = self._prepare_values(cand, keywords, director_en, director_imdb_id,
-                                      similar, angle_decision, reasons)
-
+    def _compose(self, template, values):
         lines = []
         for key in template:
             if key == "blank":
@@ -237,10 +236,34 @@ class ContentBuilder:
             if self._block_is_empty(rendered):
                 continue
             lines.append(rendered)
-
         caption = "\n".join(lines).strip()
         caption = re.sub(r"\n{3,}", "\n\n", caption)
+        return caption, lines
+
+    def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None,
+              similar=None, reasons=None):
+        angle = angle_decision.angle
+        template = (self.templates.get(angle)
+                    or self.templates.get(self.default_template)
+                    or self.templates.get("genre_recommendation")
+                    or [])
+        values = self._prepare_values(cand, keywords, director_en, director_imdb_id,
+                                      similar, angle_decision, reasons)
         max_chars = self.cfg.get("content", {}).get("max_caption_chars", 1024)
+
+        caption, lines = self._compose(template, values)
+
         if len(caption) > max_chars:
-            caption = textwrap.shorten(caption, width=max_chars, placeholder="…", break_long_words=False)
+            # اول overview (بلندترین بخش) را با بودجه‌ی باقی‌مانده جور کن تا نظم و لیست بلاک‌ها
+            # به هم نریزد؛ اگر باز هم جا نشد، بلاک‌های انتهایی را کامل حذف کن (هرگز flatten نشود).
+            overview = values.get("overview") or ""
+            overhead = len(caption) - len(overview)
+            budget = max_chars - overhead - 12
+            if budget >= 120 and len(overview) > budget:
+                values["overview"] = _shorten(overview, budget)
+                caption, lines = self._compose(template, values)
+            while len(caption) > max_chars and lines:
+                lines.pop()
+                caption = "\n".join(lines).strip()
+                caption = re.sub(r"\n{3,}", "\n\n", caption)
         return caption
