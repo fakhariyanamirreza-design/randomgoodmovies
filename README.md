@@ -117,6 +117,11 @@ genre_recommendation، weekend_recommendation.
 `content.block_template` قالب هر بلاک را می‌دهد. بلاک‌هایی که مقدار ندارند خودکار حذف می‌شوند.
 برای تغییر متن یا ترتیب، فقط config را تغییر بده.
 
+قالب هر پست (پس از عنوان) به این شکل است:
+
+- `tagline`: اسلوگان فیلم از TMDb (اگر باشد) — به‌جای جمله‌ی ثابتِ تکراری
+- `similar_movies`: ۳ فیلم مشابه از `/movie/{id}/similar` — بخش «فیلم‌های شبیه به این»
+
 ## Quality Gate
 
 `config.json → quality_gate`: بررسی عنوان، overview فارسی، پوستر، امتیاز حداقلی، معتبر بودن

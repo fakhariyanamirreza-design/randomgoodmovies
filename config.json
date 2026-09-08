@@ -91,29 +91,29 @@
   },
 
   "diversity": {
-    "_help": "محدودیت‌های انعطاف‌پذیر انتخاب نهایی و پنجره‌های تاریخچه. hard_limit ها اول اعمال می‌شوند؛ اگر هیچ فیلمی باقی نماند soft_limit ها اعمال می‌شوند.",
-    "history_window": 10,
-    "recent_window": 5,
-    "category": {
-      "hard_limit": 2,
-      "soft_limit": 1,
-      "max_consecutive": 2
-    },
-    "genre": {
-      "hard_limit": 3,
-      "soft_limit": 2,
-      "max_consecutive": 3
-    },
-    "director": {
-      "hard_limit": 2,
-      "soft_limit": 1,
-      "max_consecutive": 2
-    },
-    "era": {
-      "hard_limit": 4,
-      "soft_limit": 2,
-      "max_consecutive": 4
-    }
+"_help": "محدودیت‌های انعطاف‌پذیر انتخاب نهایی و پنجره‌های تاریخچه. hard_limit ها اول اعمال می‌شوند؛ اگر هیچ فیلمی باقی نماند soft_limit ها اعمال می‌شوند. max_consecutive=1 یعنی فیلم پشت‌سرهمِ همدسته/هم‌ژانر منتشر نشود.",
+      "history_window": 10,
+      "recent_window": 5,
+      "category": {
+        "hard_limit": 1,
+        "soft_limit": 1,
+        "max_consecutive": 1
+      },
+      "genre": {
+        "hard_limit": 2,
+        "soft_limit": 1,
+        "max_consecutive": 1
+      },
+      "director": {
+        "hard_limit": 2,
+        "soft_limit": 1,
+        "max_consecutive": 2
+      },
+      "era": {
+        "hard_limit": 3,
+        "soft_limit": 2,
+        "max_consecutive": 2
+      }
   },
 
   "angles": {
@@ -179,19 +179,20 @@
   },
 
   "content": {
-    "_help": "الگوهای هر angle. هر مورد یا 'خط' است یا یک کلید بلاک. 'blank' خط خالی. کلیدهای بلاک: title_fa,title_en,tagline,category,rating,genres,runtime,country,director_fa,director_en,overview,imdb_link,hashtags,footer.",
+    "_help": "الگوهای هر angle. هر مورد یا 'خط' است یا یک کلید بلاک. 'blank' خط خالی. کلیدهای بلاک: title_fa,title_en,tagline,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,hashtags,footer.",
     "max_caption_chars": 1024,
     "templates": {
       "highly_rated": [
         "title_fa", "title_en",
         "blank",
-        "lead_highly_rated",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -202,13 +203,14 @@
       "hidden_gem": [
         "title_fa", "title_en",
         "blank",
-        "lead_hidden_gem",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -219,13 +221,14 @@
       "director_spotlight": [
         "title_fa", "title_en",
         "blank",
-        "lead_director_spotlight",
+        "tagline",
         "blank",
         "category", "rating", "genres", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -236,13 +239,14 @@
       "award_recognition": [
         "title_fa", "title_en",
         "blank",
-        "lead_award_recognition",
+        "tagline",
         "blank",
         "category", "rating", "genres", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -253,13 +257,14 @@
       "modern_classic": [
         "title_fa", "title_en",
         "blank",
-        "lead_modern_classic",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -270,13 +275,14 @@
       "classic_recommendation": [
         "title_fa", "title_en",
         "blank",
-        "lead_classic_recommendation",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -287,13 +293,14 @@
       "short_runtime": [
         "title_fa", "title_en",
         "blank",
-        "lead_short_runtime",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -304,13 +311,14 @@
       "influential_film": [
         "title_fa", "title_en",
         "blank",
-        "lead_influential_film",
+        "tagline",
         "blank",
         "category", "rating", "genres", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -321,13 +329,14 @@
       "decade_recommendation": [
         "title_fa", "title_en",
         "blank",
-        "lead_decade_recommendation",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -338,13 +347,14 @@
       "genre_recommendation": [
         "title_fa", "title_en",
         "blank",
-        "lead_genre_recommendation",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -355,13 +365,14 @@
       "weekend_recommendation": [
         "title_fa", "title_en",
         "blank",
-        "lead_weekend_recommendation",
+        "tagline",
         "blank",
         "category", "rating", "genres", "runtime", "country",
         "blank",
         "director_fa", "director_en",
         "blank",
         "overview",
+        "similar_movies",
         "blank",
         "imdb_link",
         "blank",
@@ -383,19 +394,9 @@
       "director_en": "↳ {director_en}",
       "overview": "📝 {overview}",
       "imdb_link": "🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>",
+      "similar_movies": "🎯 فیلم‌های شبیه به این:\n{similar_movies}",
       "hashtags": "{hashtags}",
-      "footer": "{footer}",
-      "lead_highly_rated": "یکی از فیلم‌های بسیار پرامتیاز سینما با امتیاز {rating}/10.",
-      "lead_hidden_gem": "اگر دنبال فیلمی هستی که احتمالاً کمتر دیده‌ای اما ارزش دیدن دارد، این انتخاب ماست.",
-      "lead_director_spotlight": "یک فیلم از {director_fa} — کارگردانی که کمتر کسی می‌تواند مثل او قصه تعریف کند.",
-      "lead_award_recognition": "فیلمی که در جشنواره‌ها و جوایز سینمایی درخشیده است.",
-      "lead_modern_classic": "یک اثر مدرن که به‌سرعت به یکی از کلاسیک‌های سینما تبدیل شد.",
-      "lead_classic_recommendation": "یک کلاسیک ماندگار که هر عاشق سینما باید دیده باشد.",
-      "lead_short_runtime": "یک فیلم کوتاه‌مدت اما پرنیرو — مناسب یک نشست کوتاه و مفید.",
-      "lead_influential_film": "فیلمی که روی نسل‌های بعدی سینما تأثیر گذاشته است.",
-      "lead_decade_recommendation": "یک پیشنهاد ویژه از فیلم‌های شاخص این دهه.",
-      "lead_genre_recommendation": "یک پیشنهاد بر اساس ژانر — تماشای آن را از دست نده.",
-      "lead_weekend_recommendation": "یک انتخاب عالی برای تعطیلات آخر هفته."
+      "footer": "{footer}"
     }
   },
 

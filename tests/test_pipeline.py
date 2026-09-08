@@ -62,6 +62,12 @@ class FakeTMDbClient:
     def movie_keywords(self, movie_id):
         return ["شناخته_شده", "cannes"]
 
+    def movie_similar(self, movie_id, language="en-US", limit=3):
+        return [
+            {"id": 900, "title": f"Similar {movie_id} A", "year": 2009},
+            {"id": 901, "title": f"Similar {movie_id} B", "year": 2015},
+        ]
+
     def person_english_name(self, person_id):
         return "Denis Villeneuve"
 
@@ -124,6 +130,7 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("score_breakdown", entry)
         self.assertIn("caption", entry)
         self.assertIn("genres", entry)
+        self.assertIn("فیلم‌های شبیه به این", entry["caption"])
 
     def test_no_publish_when_all_rejected_by_quality(self):
         cfg = real_config()

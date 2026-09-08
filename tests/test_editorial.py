@@ -76,6 +76,44 @@ class EditorialTests(unittest.TestCase):
         acc = make_candidate(tmdb_id=100, profile="اکشن", profile_key="اکشن")
         self.assertEqual(mem.consecutive_count("profile", "اکشن"), 2)
 
+    def test_no_back_to_back_same_category_or_genre(self):
+        # شبیه‌سازی اونجرز→اسپایدرمن: پست قبلی اکشن/ماجراجویی/علمی-تخیلی است
+        posts = [{
+            "id": 1, "title": "Avengers", "genres": [28, 12, 878],
+            "profile": "اکشن مدرن پرامتیاز", "director": "Whedon", "era": "2010s",
+        }]
+        history = base_history(posts)
+        mem = HistoryMemory(history, self.config)
+        scorer = ScoringEngine(self.config, mem)
+        eng = EditorialEngine(self.config, mem)
+
+        blockbuster = _cand(10, "Spider-Man", [28, 12, 878], "اکشن مدرن پرامتیاز", "Watts", "2020s")
+        drama = _cand(20, "یک درام متفاوت", [18], "درام‌های جایزه‌گرفته", "Villeneuve", "2010s")
+        ranked = scorer.score_many([blockbuster, drama])
+
+        primary, ordered = eng.enforce(ranked, top_n=2)
+        self.assertIsNotNone(primary)
+        self.assertEqual(primary[2]["tmdb_id"], 20,
+                         "نباید پشت‌سرهم فیلمی هم‌دسته/هم‌ژانر با پست قبل انتخاب شود")
+
+    def test_soft_fallback_penalizes_back_to_back(self):
+        # همه‌ی کاندیداها هم‌ژانر با پست قبل؛ soft باید کم‌تخلف‌ترین را انتخاب کند
+        posts = [{
+            "id": 1, "title": "Prev", "genres": [28], "profile": "P1", "director": "X", "era": "2010s",
+        }]
+        history = base_history(posts)
+        mem = HistoryMemory(history, self.config)
+        scorer = ScoringEngine(self.config, mem)
+        eng = EditorialEngine(self.config, mem)
+
+        shares_genre = _cand(10, "A", [28, 35], "P2", "D2", "2010s", rating=9.0)
+        different = _cand(20, "B", [18], "P3", "D3", "2000s", rating=8.0)
+        ranked = scorer.score_many([shares_genre, different])
+
+        primary, ordered = eng.enforce(ranked, top_n=2)
+        self.assertIsNotNone(primary)
+        self.assertEqual(primary[2]["tmdb_id"], 20)
+
 
 if __name__ == "__main__":
     unittest.main()

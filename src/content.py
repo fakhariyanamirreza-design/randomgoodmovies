@@ -39,7 +39,7 @@ class ContentBuilder:
         self.overview_max_chars = config.get("posting", {}).get("overview_max_chars", 320)
         self.include_keywords = content.get("include_keywords", True)
 
-    def _prepare_values(self, cand, keywords, director_en, director_imdb_id):
+    def _prepare_values(self, cand, keywords, director_en, director_imdb_id, similar=None):
         rating = float(cand.get("rating", 0) or 0)
         genres = "، ".join(GENRE_FA.get(gid, gname) for gid, gname in
                            zip(cand.get("genres") or [], cand.get("genre_names_fa") or []))
@@ -65,6 +65,14 @@ class ContentBuilder:
             else:
                 director_line_en = director_en
 
+        similar_lines = []
+        for item in (similar or []):
+            title = item.get("title") or ""
+            year = item.get("year")
+            line = f"• {title}" + (f" ({year})" if year else "")
+            if line.strip() != "•":
+                similar_lines.append(line)
+
         return {
             "title_fa": cand.get("title_fa"),
             "title_en": cand.get("title_en"),
@@ -79,6 +87,7 @@ class ContentBuilder:
             "director_en": director_line_en or "",
             "overview": overview,
             "imdb_link": imdb_link or "",
+            "similar_movies": "\n".join(similar_lines),
             "hashtags": hashtags,
             "footer": self.cfg.get("posting", {}).get("channel_footer") or "",
         }
@@ -104,15 +113,17 @@ class ContentBuilder:
         "director_fa": "director_fa",
         "director_en": "director_en",
         "overview": "overview",
+        "similar_movies": "similar_movies",
         "imdb_link": "imdb_link",
         "hashtags": "hashtags",
         "footer": "footer",
     }
 
-    def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None):
+    def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None,
+              similar=None):
         angle = angle_decision.angle
         template = self.templates.get(angle) or self.templates.get("genre_recommendation") or []
-        values = self._prepare_values(cand, keywords, director_en, director_imdb_id)
+        values = self._prepare_values(cand, keywords, director_en, director_imdb_id, similar)
 
         lines = []
         for key in template:
@@ -134,6 +145,7 @@ class ContentBuilder:
             lines.append(rendered)
 
         caption = "\n".join(lines).strip()
+        caption = re.sub(r"\n{3,}", "\n\n", caption)
         max_chars = self.cfg.get("content", {}).get("max_caption_chars", 1024)
         if len(caption) > max_chars:
             caption = textwrap.shorten(caption, width=max_chars, placeholder="…", break_long_words=False)

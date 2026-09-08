@@ -54,7 +54,11 @@ def latest_use_dates(history, field="genres", now=None):
 
 
 def max_consecutive(posts, field="profile", value=None):
-    """بیشترین رشته‌ی پشت‌سرهم مقداری (یا از آخر در صورت value معین)."""
+    """بیشترین رشته‌ی پشت‌سرهم مقداری (یا از آخر در صورت value معین).
+
+    برای فیلدهای لیستی (مثل genres) اگر value معین باشد، «پشت‌سرهم» یعنی پست‌هایی
+    که مقدار در لیستشان باشد.
+    """
     values = [item.get(field) for item in posts]
     if value is None:
         best = cur = 0
@@ -67,9 +71,15 @@ def max_consecutive(posts, field="profile", value=None):
             prev = v
             best = max(best, cur)
         return best
+
+    def is_match(v):
+        if isinstance(v, list):
+            return value in v
+        return v == value
+
     n = 0
     for v in reversed(values):
-        if v == value:
+        if is_match(v):
             n += 1
         else:
             break

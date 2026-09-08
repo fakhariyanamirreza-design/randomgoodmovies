@@ -90,7 +90,13 @@ def build_attempt(client, angles, content, quality, cand):
         director_en = client.person_english_name(cand["director_id"])
         director_imdb_id = client.person_imdb_id(cand["director_id"])
 
-    caption = content.build(cand, angle_decision, keywords, director_en, director_imdb_id)
+    try:
+        similar = client.movie_similar(cand.get("tmdb_id"))
+    except Exception:
+        similar = []
+
+    caption = content.build(cand, angle_decision, keywords, director_en, director_imdb_id,
+                            similar=similar)
     return caption, angle_decision, keywords
 
 

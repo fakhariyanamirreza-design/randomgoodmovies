@@ -45,7 +45,49 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertEqual(angle.angle, "hidden_gem")
         caption = self.builder.build(cand, angle, ["drama"], director_en=None,
                                      director_imdb_id=None)
-        self.assertIn("گوهر پنهان", caption)
+        self.assertIn("8.2", caption)
+
+    def test_lead_sentence_removed(self):
+        cand = make_candidate(rating=8.2)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertNotIn("گوهر پنهان", caption)
+        self.assertNotIn("یک فیلم از", caption)
+
+    def test_tagline_used_when_present(self):
+        cand = make_candidate(tagline="Somewhere, something incredible is waiting to be known.")
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("Somewhere, something incredible", caption)
+
+    def test_tagline_skipped_when_missing(self):
+        cand = make_candidate(tagline="")
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertNotIn("💬", caption)
+        self.assertNotIn("«»", caption)
+
+    def test_similar_movies_section_rendered(self):
+        cand = make_candidate(title_fa="وردپرس")
+        angle = self.angles.choose(cand, keywords=[])
+        similar = [
+            {"id": 1, "title": "Inception", "year": 2010},
+            {"id": 2, "title": "Interstellar", "year": 2014},
+            {"id": 3, "title": "The Prestige", "year": None},
+        ]
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                     similar=similar)
+        self.assertIn("فیلم‌های شبیه به این", caption)
+        self.assertIn("Inception (2010)", caption)
+        self.assertIn("Interstellar (2014)", caption)
+        self.assertIn("The Prestige", caption)
+
+    def test_similar_movies_section_hidden_when_empty(self):
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                     similar=[])
+        self.assertNotIn("فیلم‌های شبیه به این", caption)
 
     def test_empty_fields_are_skipped(self):
         cand = make_candidate(title_fa="", overview_fa="", runtime=None,

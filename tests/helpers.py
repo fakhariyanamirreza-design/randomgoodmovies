@@ -44,10 +44,10 @@ def base_config():
         "diversity": {
             "history_window": 10,
             "recent_window": 5,
-            "category": {"hard_limit": 2, "soft_limit": 1, "max_consecutive": 2},
-            "genre": {"hard_limit": 3, "soft_limit": 2, "max_consecutive": 3},
+            "category": {"hard_limit": 1, "soft_limit": 1, "max_consecutive": 1},
+            "genre": {"hard_limit": 2, "soft_limit": 1, "max_consecutive": 1},
             "director": {"hard_limit": 2, "soft_limit": 1, "max_consecutive": 2},
-            "era": {"hard_limit": 4, "soft_limit": 2, "max_consecutive": 4},
+            "era": {"hard_limit": 3, "soft_limit": 2, "max_consecutive": 2},
         },
         "angles": {
             "priority": [
@@ -76,20 +76,22 @@ def base_config():
             "include_keywords": True,
             "templates": {
                 "genre_recommendation": [
-                    "title_fa", "title_en", "blank", "lead_genre_recommendation",
+                    "title_fa", "title_en", "blank", "tagline",
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
-                    "blank", "imdb_link", "blank", "hashtags", "blank", "footer",
+                    "similar_movies", "blank", "imdb_link", "blank", "hashtags",
+                    "blank", "footer",
                 ],
                 "hidden_gem": [
-                    "title_fa", "blank", "lead_hidden_gem", "blank", "rating",
-                    "genres", "blank", "overview", "blank", "footer",
+                    "title_fa", "title_en", "blank", "tagline",
+                    "blank", "rating", "genres", "blank", "overview",
+                    "similar_movies", "blank", "footer",
                 ],
             },
             "block_template": {
                 "title_fa": "🎬 <b>{title_fa}</b> ({year})",
                 "title_en": "↳ {title_en} ({year})",
-                "title_en_txt": "{title_en}",
+                "tagline": "💬 «{tagline}»",
                 "category": "🗂 دسته: {category}",
                 "rating": "⭐ امتیاز: {rating}/10",
                 "genres": "🎭 ژانر: {genres}",
@@ -101,8 +103,7 @@ def base_config():
                 "imdb_link": "🔗 <a href=\"{imdb_link}\">صفحه فیلم در IMDB</a>",
                 "hashtags": "{hashtags}",
                 "footer": "{footer}",
-                "lead_hidden_gem": "یک گوهر پنهان: {title_fa}",
-                "lead_genre_recommendation": "پیشنهاد ژانری: {genres}",
+                "similar_movies": "🎯 فیلم‌های شبیه به این:\n{similar_movies}",
             },
         },
         "quality_gate": {

@@ -75,6 +75,27 @@ class TMDbClient:
         data = self._get(f"movie/{movie_id}/keywords")
         return [k.get("name") for k in data.get("keywords", [])]
 
+    def movie_similar(self, movie_id, language="en-US", limit=3):
+        """۳ فیلم مشابه از /movie/{id}/similar (رایگان است).
+
+        برمی‌گرداند: list[dict{id, title, year}] — در صورت خطا/خالی بودن [].
+        """
+        try:
+            data = self._get(f"movie/{movie_id}/similar", {"language": language})
+        except TMDbError:
+            return []
+        out = []
+        for item in (data.get("results") or [])[:limit]:
+            year = None
+            rd = item.get("release_date") or ""
+            try:
+                if rd:
+                    year = int(rd[:4])
+            except ValueError:
+                year = None
+            out.append({"id": item.get("id"), "title": item.get("title"), "year": year})
+        return out
+
     def person_imdb_id(self, person_id):
         try:
             return self._get(f"person/{person_id}/external_ids").get("imdb_id")

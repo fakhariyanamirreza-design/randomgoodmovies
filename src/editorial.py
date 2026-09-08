@@ -11,6 +11,16 @@ import random
 from .history import counts_in_window
 
 
+# نام فیلد واقعی هر بعد در تاریخچه (category در history با کلید profile ذخیره می‌شود،
+# genre با کلید genres که لیستی است)
+CONSEC_FIELD = {
+    "category": "profile",
+    "genre": "genres",
+    "director": "director",
+    "era": "era",
+}
+
+
 class DiversityResult:
     def __init__(self, candidate, reasons):
         self.candidate = candidate
@@ -28,7 +38,8 @@ class EditorialEngine:
         if not value:
             return True, None
         limit = self.diversity_cfg.get(dimension, {}).get("max_consecutive", 99)
-        count = self.history_mem.consecutive_count(dimension, value)
+        field = CONSEC_FIELD.get(dimension, dimension)
+        count = self.history_mem.consecutive_count(field, value)
         if count >= limit:
             return False, (f"{value} بیش از {limit} بار پشت‌سرهم استفاده شده است")
         return True, None
@@ -142,8 +153,16 @@ class EditorialEngine:
                     if not ok:
                         n_penalties += 1
                         reasons.append(r)
+                    ok, r = self._check_consecutive(cand, dimension, key)
+                    if not ok:
+                        n_penalties += 1
+                        reasons.append(r)
                 for g in (cand.get("genres") or []):
                     ok, r = self._within_group_limits(cand, "genre", g, genre_counts, "soft_limit")
+                    if not ok:
+                        n_penalties += 1
+                        reasons.append(r)
+                    ok, r = self._check_consecutive(cand, "genre", g)
                     if not ok:
                         n_penalties += 1
                         reasons.append(r)
