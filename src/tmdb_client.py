@@ -146,6 +146,13 @@ class TMDbClient:
         except TMDbError:
             return None
 
+    def person_birthday(self, person_id):
+        """تاریخ تولد شخص (ISO) برای زاویه‌ی سالروز تولد؛ در صورت خطا None."""
+        try:
+            return self._get(f"person/{person_id}").get("birthday")
+        except TMDbError:
+            return None
+
 
 def get_director(details):
     """اولین کارگردان از credits را برمی‌گرداند."""

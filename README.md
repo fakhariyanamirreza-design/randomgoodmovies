@@ -108,9 +108,14 @@ tests/                   # ۶۳ تست unittest (بدون نیاز به شبکه
 - `rules`: شرایط هر angle (مثلاً «highly_rated» نیاز به rating≥8.3 و رأی≥3000)
 - `default_angle`: سقوط اگر هیچ قانونی جور نبود
 
-زاویه‌ها: trending_now، highly_rated، hidden_gem، director_spotlight، award_recognition،
-modern_classic، classic_recommendation، short_runtime، influential_film،
-decade_recommendation، genre_recommendation، weekend_recommendation.
+زاویه‌ها: trending_now، release_anniversary، director_birthday، highly_rated، hidden_gem،
+director_spotlight، award_recognition، modern_classic، classic_recommendation،
+short_runtime، influential_film، decade_recommendation، genre_recommendation،
+weekend_recommendation.
+
+زاویه‌های تاریخ‌محور: `release_anniversary` (سالگرد اکران) و `director_birthday` (تولد
+کارگردان) بدون نیاز به هیچ API پولی — فقط از `release_date` و `person/{id}/birthday` TMDb محاسبه
+می‌شوند و تا وقتی که در آن روز ویژه رخ ندهد، انتخاب نمی‌شوند.
 
 ## پوستر اصلی فیلم
 
@@ -129,16 +134,27 @@ decade_recommendation، genre_recommendation، weekend_recommendation.
 
 `config.json → content.templates` برای هر angle یک الگو دارد (ترتیب بلاک‌ها) و
 `content.block_template` قالب هر بلاک را می‌دهد. بلاک‌هایی که مقدار ندارند خودکار حذف می‌شوند.
+اگر angled قالبی نداشته باشد از `content.default_template` استفاده می‌شود (برای یکدستی ظاهری).
 برای تغییر متن یا ترتیب، فقط config را تغییر بده.
 
 قالب هر پست (پس از عنوان) به این شکل است:
 
+- `title_fa`: هدر یکدست با ایموجی ژانر + پرچم کشور سازنده، مثلاً `💥 **تلقین** (2010) 🇺🇸`.
+  نگاشت ژانر→ایموجی در `content.genre_emoji` و ایموجی پیش‌فرض در `genre_emoji_default`.
 - `tagline`: اسلوگان فیلم از TMDb (اگر باشد) — به‌جای جمله‌ی ثابتِ تکراری
 - `trending_line`: «همین حالا در ترند روز TMDb است» — فقط برای فیلم‌های ترند
+- `occasion_line`: پیام سالگرد اکران یا تولد کارگردان (فقط در همان روز)
+- `teaser_line`: یک خط حدس/قلاب؛ از `content.teaser_variants` به‌صورت قطعی می‌چرخد تا پست‌های
+  پشت‌سرهم تکراری نشوند
 - `similar_movies`: ۳ فیلم مشابه از `/movie/{id}/similar` — بخش «فیلم‌های شبیه به این»
   (هدر بُلد است و یک خط خالی قبلش دارد). برای جلوگیری از پیشنهادهای عجیب، فیلم مشابه
   باید حداقل یک ژانر مشترک با فیلم اصلی داشته باشد و ریتینگ/رأیِ قابل‌قبول؛ مرتب‌سازی بر
   اساس (تعداد ژانر مشترک، امتیاز، رأی).
+- `audience_line`: بر اساس بهترین فیلمِ مشابه: «اگر X را دوست داشتی، این فیلم همان حال و هواست»
+- `hashtags`: در حالت `structured` هشتگ‌های پایدار «ژانر_سال_دهه» با ارقام فارسی؛ در حالت
+  `keywords` پرچم‌ها از کلمات کلیدی TMDb ساخته می‌شوند
+- `why_line`: توضیح کوتاه «چرا این؟» — از نگاشت `content.why_lines[angle]` وگرنه اولین دلیل
+  سردبیری (به‌جز «قبلاً منتشر نشده»)
 
 ## Quality Gate
 

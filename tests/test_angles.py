@@ -3,6 +3,7 @@
 import sys
 import os
 import unittest
+from datetime import date
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -75,6 +76,38 @@ class AngleTests(unittest.TestCase):
                               popularity=25.0, director=None, runtime=None)
         result = self.engine.choose(cand, keywords=[])
         self.assertEqual(result.angle, "influential_film")
+
+    def test_release_anniversary_takes_priority(self):
+        cand = make_candidate(rating=9.0, vote_count=5000, year=2005,
+                              _anniversary_today=True, _anniversary_years=21)
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 8))
+        self.assertEqual(result.angle, "release_anniversary")
+        self.assertEqual(result.reasons[0], "سالگرد اکران: 21 سال پیش در چنین روزی")
+
+    def test_release_anniversary_not_chosen_otherwise(self):
+        cand = self.engine
+        normal = make_candidate(rating=9.0, vote_count=5000, year=2005,
+                                _anniversary_today=False)
+        result = self.engine.choose(normal, keywords=[], today=date(2026, 9, 8))
+        self.assertNotEqual(result.angle, "release_anniversary")
+
+    def test_director_birthday_takes_priority(self):
+        cand = make_candidate(rating=9.0, vote_count=5000, year=2005,
+                              director="نیکولاس کیج", _birthday_today=True)
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 1, 7))
+        self.assertEqual(result.angle, "director_birthday")
+        self.assertIn("تولد", result.reasons[0])
+
+    def test_director_birthday_not_chosen_otherwise(self):
+        normal = make_candidate(rating=9.0, vote_count=5000, year=2005,
+                                _birthday_today=False)
+        result = self.engine.choose(normal, keywords=[], today=date(2026, 9, 8))
+        self.assertNotEqual(result.angle, "director_birthday")
+
+    def test_today_defaults_to_real_today(self):
+        cand = make_candidate(trending=False, rating=6.5, vote_count=500, year=2000)
+        result = self.engine.choose(cand, keywords=[])
+        self.assertEqual(result.angle, "genre_recommendation")
 
 
 if __name__ == "__main__":

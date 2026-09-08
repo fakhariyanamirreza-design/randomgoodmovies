@@ -85,6 +85,7 @@ def build_candidate(profile_name, profile, list_movie, details_fa, details_en,
         "poster_path": poster_path,
         "era": None,  # بعداً با decade_brackets پر می‌شود
         "countries_fa": country_names_fa(details_fa),
+        "countries_iso": [c.get("iso_3166_1") for c in (details_fa.get("production_countries") or [])],
     }
 
 

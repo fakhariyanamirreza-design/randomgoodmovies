@@ -124,6 +124,107 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertNotIn("کارگردان", caption)
         self.assertNotIn("ژانر:", caption)
 
+    def test_genre_emoji_from_config(self):
+        cand = make_candidate(genres=[28], genre_names_fa=["اکشن"], rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("💥 <b>وردپرس</b>", caption)
+
+    def test_genre_emoji_default_when_unknown(self):
+        cand = make_candidate(genres=[9999], genre_names_fa=["عجیب"], rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("🎬 <b>وردپرس</b>", caption)
+
+    def test_title_has_flag_and_year(self):
+        cand = make_candidate(countries_iso=["US"], countries_fa=["آمریکا"], rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("<b>وردپرس</b> (2010) 🇺🇸", caption)
+
+    def test_teaser_line_rotates_deterministically(self):
+        angles = self.angles
+        a = angles.choose(make_candidate(tmdb_id=0, rating=8.5), keywords=[])
+        b = angles.choose(make_candidate(tmdb_id=1, rating=8.5), keywords=[])
+        c1 = self.builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
+                                director_imdb_id=None)
+        c2 = self.builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
+                                director_imdb_id=None)
+        c3 = self.builder.build(make_candidate(tmdb_id=1, rating=8.5), b, [], director_en=None,
+                                director_imdb_id=None)
+        self.assertEqual(c1, c2, "انتخاب تیزر باید قطعی باشد")
+        self.assertNotEqual(c1.split("\n"), c3.split("\n"), "تیزر بین پست‌های مختلف باید بچرخد")
+
+    def test_teaser_absent_when_no_variants(self):
+        cfg = base_config()
+        cfg["content"]["teaser_variants"] = []
+        builder = ContentBuilder(cfg)
+        angle = AngleEngine(cfg).choose(make_candidate(rating=8.5), keywords=[])
+        caption = builder.build(make_candidate(rating=8.5), angle, [], director_en=None,
+                                director_imdb_id=None)
+        self.assertNotIn("حدس بزن", caption)
+
+    def test_structured_hashtags(self):
+        cand = make_candidate(genres=[18], genre_names_fa=["درام"], year=2010, era="2010s")
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, ["whatever"], director_en=None, director_imdb_id=None)
+        self.assertIn("#درام #2010 #دهه_۲۰۱۰", caption)
+        self.assertNotIn("#whatever", caption)
+
+    def test_audience_line_from_top_similar(self):
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        similar = [{"id": 1, "title": "Inception", "year": 2010}]
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                     similar=similar)
+        self.assertIn("🎯 اگر «Inception» را دوست داشتی، این فیلم همان حال و هواست.", caption)
+
+    def test_why_line_from_angle_mapping(self):
+        cand = make_candidate(rating=8.5, trending=True)
+        angle = self.angles.choose(cand, keywords=[])
+        self.assertEqual(angle.angle, "trending_now")
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("چون همین حالا در ترند روز است 🌡️", caption)
+
+    def test_why_line_falls_back_to_reason(self):
+        cfg = base_config()
+        cfg["content"]["why_lines"] = {}
+        builder = ContentBuilder(cfg)
+        cand = make_candidate(rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                reasons=["اولین دلیل", "دلیل دوم"])
+        self.assertIn("اولین دلیل", caption)
+
+    def test_why_line_skips_duplicate_reason(self):
+        cfg = base_config()
+        cfg["content"]["why_lines"] = {}
+        builder = ContentBuilder(cfg)
+        cand = make_candidate(rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                reasons=["قبلاً منتشر نشده", "دلیل دوم"])
+        self.assertIn("دلیل دوم", caption)
+
+    def test_occasion_line_renders(self):
+        cand = make_candidate(_occasion="🎂 امروز تولد کارگردانش است.", rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertIn("🎂 امروز تولد کارگردانش است.", caption)
+
+    def test_occasion_line_absent_when_none(self):
+        cand = make_candidate(rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertNotIn("🎂", caption)
+
+    def test_audio_line_absent_when_no_similar(self):
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None,
+                                     similar=[])
+        self.assertNotIn("اگر", caption)
+
     def test_caption_not_exceeding_max_chars(self):
         cand = make_candidate(overview_fa="x" * 1000)
         angle = self.angles.choose(cand, keywords=[])

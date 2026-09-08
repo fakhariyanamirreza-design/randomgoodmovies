@@ -8,6 +8,23 @@ import textwrap
 
 from .common import GENRE_FA
 
+FA_DIGITS = "۰۱۲۳۴۵۶۷۸۹"
+
+
+def fa_digits(text):
+    """تبدیل ارقام انگلیسی به فارسی در یک رشته."""
+    return "".join(FA_DIGITS[int(c)] if c.isdigit() else c for c in str(text))
+
+
+def _flag_emoji(iso):
+    """پرچم کشور از کد دوحرفی ISO (مثلاً US → 🇺🇸)؛ بدون کد معتبر خالی."""
+    if not iso or len(iso) != 2:
+        return ""
+    a, b = ord(iso[0].upper()), ord(iso[1].upper())
+    if not (ord("A") <= a <= ord("Z") and ord("A") <= b <= ord("Z")):
+        return ""
+    return chr(0x1F1E6 + a - ord("A")) + chr(0x1F1E6 + b - ord("A"))
+
 
 def format_runtime_fa(minutes):
     if not minutes:
@@ -35,11 +52,30 @@ class ContentBuilder:
         self.cfg = config
         content = config.get("content", {})
         self.templates = content.get("templates", {})
+        self.default_template = content.get("default_template", "genre_recommendation")
         self.blocks = content.get("block_template", {})
         self.overview_max_chars = config.get("posting", {}).get("overview_max_chars", 320)
         self.include_keywords = content.get("include_keywords", True)
 
-    def _prepare_values(self, cand, keywords, director_en, director_imdb_id, similar=None):
+    def _structured_hashtags(self, cand):
+        """هشتگ‌های پایدار و قابل‌جست‌وجو: ژانر اصلی + سال + دهه."""
+        tags = []
+        genres = cand.get("genres") or []
+        genre_names_fa = cand.get("genre_names_fa") or []
+        if genres:
+            gname = GENRE_FA.get(genres[0], genre_names_fa[0] if genre_names_fa else "")
+            if gname:
+                tags.append("#" + re.sub(r"\s+", "_", gname))
+        year = cand.get("year")
+        if year:
+            tags.append("#" + str(year))
+        era = cand.get("era") or ""
+        if era.endswith("s") and era[:-1].isdigit():
+            tags.append("#دهه_" + fa_digits(era[:-1]))
+        return " ".join(tags)
+
+    def _prepare_values(self, cand, keywords, director_en, director_imdb_id, similar=None,
+                        angle_decision=None, reasons=None):
         rating = float(cand.get("rating", 0) or 0)
         genres = "، ".join(GENRE_FA.get(gid, gname) for gid, gname in
                            zip(cand.get("genres") or [], cand.get("genre_names_fa") or []))
@@ -48,7 +84,12 @@ class ContentBuilder:
 
         runtime_text = format_runtime_fa(cand.get("runtime"))
         director_fa = cand.get("director")
-        hashtags = keywords_to_hashtags(keywords) if self.include_keywords else ""
+
+        content_cfg = self.cfg.get("content", {})
+        if content_cfg.get("hashtag_mode", "structured") == "keywords":
+            hashtags = keywords_to_hashtags(keywords) if self.include_keywords else ""
+        else:
+            hashtags = self._structured_hashtags(cand)
 
         overview = cand.get("overview_fa") or cand.get("overview_en") or ""
         if len(overview) > self.overview_max_chars:
@@ -73,11 +114,54 @@ class ContentBuilder:
             if line.strip() != "•":
                 similar_lines.append(line)
 
+        # ایموجی ژانر (ایده ۱): اولین/اصلی‌ترین ژانر → ایموجی، وگرنه پیش‌فرض
+        first_genre = (cand.get("genres") or [None])[0]
+        genre_emoji = content_cfg.get("genre_emoji", {}).get(str(first_genre)) \
+            if first_genre is not None else None
+        genre_emoji = genre_emoji or content_cfg.get("genre_emoji_default", "🎬")
+
+        # پرچم کشور اصلی (ایده ۵)
+        isos = cand.get("countries_iso") or []
+        flag = ""
+        if isos:
+            fl = _flag_emoji(str(isos[0]).upper())
+            if fl:
+                flag = f" {fl}"
+
+        # تیزر/قلاب جذابیت دورانی (ایده ۲) — با چرخش تعیین‌شده‌ی بین پست‌ها
+        teaser_variants = content_cfg.get("teaser_variants", [])
+        teaser_line = ""
+        if teaser_variants:
+            mid = cand.get("tmdb_id") or 0
+            teaser_line = teaser_variants[mid % len(teaser_variants)]
+
+        # رویدادهای تاریخ‌محور (ایده ۸) — توسط main روی cand محاسبه شد
+        occasion_line = cand.get("_occasion") or ""
+
+        # مخاطب‌شناس (ایده ۷): بر اساس اولین فیلم مشابه
+        audience_line = ""
+        if similar:
+            first_title = similar[0].get("title") or ""
+            if first_title:
+                audience_line = f"🎯 اگر «{first_title}» را دوست داشتی، این فیلم همان حال و هواست."
+
+        # «چرا این؟» (ایده ۱۰): از نگاشت angle یا اولین دلیل editorial
+        angle = angle_decision.angle if angle_decision else ""
+        why_line = content_cfg.get("why_lines", {}).get(angle) or ""
+        if not why_line and reasons:
+            why_line = next((r for r in reasons if r and r != "قبلاً منتشر نشده"), "")
+
         return {
             "title_fa": cand.get("title_fa"),
             "title_en": cand.get("title_en"),
             "year": str(cand.get("year")) if cand.get("year") else "----",
             "tagline": cand.get("tagline") or "",
+            "genre_emoji": genre_emoji,
+            "flag": flag,
+            "teaser_line": teaser_line,
+            "occasion_line": occasion_line,
+            "audience_line": audience_line,
+            "why_line": why_line,
             "category": cand.get("profile") or cand.get("profile_key") or "",
             "rating": f"{rating:.1f}",
             "genres": genres,
@@ -116,16 +200,24 @@ class ContentBuilder:
         "overview": "overview",
         "similar_movies": "similar_movies",
         "trending_line": "trending_line",
+        "teaser_line": "teaser_line",
+        "occasion_line": "occasion_line",
+        "audience_line": "audience_line",
+        "why_line": "why_line",
         "imdb_link": "imdb_link",
         "hashtags": "hashtags",
         "footer": "footer",
     }
 
     def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None,
-              similar=None):
+              similar=None, reasons=None):
         angle = angle_decision.angle
-        template = self.templates.get(angle) or self.templates.get("genre_recommendation") or []
-        values = self._prepare_values(cand, keywords, director_en, director_imdb_id, similar)
+        template = (self.templates.get(angle)
+                    or self.templates.get(self.default_template)
+                    or self.templates.get("genre_recommendation")
+                    or [])
+        values = self._prepare_values(cand, keywords, director_en, director_imdb_id,
+                                      similar, angle_decision, reasons)
 
         lines = []
         for key in template:

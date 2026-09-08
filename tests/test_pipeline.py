@@ -74,6 +74,9 @@ class FakeTMDbClient:
     def person_english_name(self, person_id):
         return "Denis Villeneuve"
 
+    def person_birthday(self, person_id):
+        return "1959-01-01"
+
     def person_imdb_id(self, person_id):
         return "nm0898288"
 
@@ -197,11 +200,15 @@ class PipelineTests(unittest.TestCase):
             "quality", "novelty", "category_diversity", "genre_diversity",
             "director_diversity", "era_diversity", "popularity", "surprise",
         }))
-        self.assertIn("hidden_gem", cfg["content"]["templates"])
-        self.assertIn("highly_rated", cfg["content"]["templates"])
+        self.assertIn("trending", w)
+        content = cfg["content"]
+        # هر angle یا قالب اختصاصی دارد یا default_template به عنوان fallback
+        self.assertTrue(content.get("default_template"), "default_template باید تعریف شود")
+        self.assertIn(content["default_template"], content["templates"])
         for angle in cfg["angles"]["priority"]:
-            self.assertIn(angle, cfg["content"]["templates"],
-                          f"هیچ قالب کپشنی برای angle {angle} تعریف نشده")
+            self.assertTrue(
+                angle in content["templates"] or content.get("default_template") in content["templates"],
+                f"هیچ قالب کپشنی برای angle {angle} تعریف نشده")
         self.assertIn("diversity", cfg)
         self.assertIn("quality_gate", cfg)
 

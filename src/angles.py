@@ -4,6 +4,8 @@
 هر تصمیم، توضیح کوتاهی دارد (که در لاگ و history می‌نشیند).
 """
 
+from datetime import date
+
 
 class AngleDecision:
     def __init__(self, angle, reasons):
@@ -38,9 +40,13 @@ class AngleEngine:
         self.default_angle = angles_cfg.get("default_angle", "genre_recommendation")
         self.posting = config.get("posting", {})
 
-    def choose(self, cand, keywords=None):
-        """برمی‌گرداند AngleDecision. keywords اختیاری (برای award detection)."""
+    def choose(self, cand, keywords=None, today=None):
+        """برمی‌گرداند AngleDecision. keywords اختیاری (برای award detection).
+
+        today: تاریخ (date) برای زاویه‌های تاریخ‌محور؛ پیش‌فرض امروز.
+        """
         keywords = keywords or []
+        today = today or date.today()
         for angle in self.priority:
             rule = self.rules.get(angle, {})
             reasons = []
@@ -50,6 +56,17 @@ class AngleEngine:
                     ok = False
                 else:
                     reasons.append("همین حالا جزو فیلم‌های ترند روز TMDb است")
+            elif angle == "release_anniversary":
+                if not cand.get("_anniversary_today"):
+                    ok = False
+                else:
+                    years = cand.get("_anniversary_years") or "؟"
+                    reasons.append(f"سالگرد اکران: {years} سال پیش در چنین روزی")
+            elif angle == "director_birthday":
+                if not cand.get("_birthday_today"):
+                    ok = False
+                else:
+                    reasons.append(f"امروز تولد {cand.get('director') or 'کارگردان'} است 🎂")
             elif angle == "highly_rated":
                 if _rating(cand) < rule.get("min_rating", 99):
                     ok = False

@@ -10,7 +10,7 @@ Discover → Filter → Score → Analyze History → Select → Choose Angle �
 
 import os
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from src.angles import AngleEngine
 from src.content import ContentBuilder
@@ -74,15 +74,50 @@ def record_history(history, cand, breakdown, total, angle_decision, caption, pos
     return entry
 
 
-def build_attempt(client, angles, content, quality, cand):
-    """برای یک کاندیدا: keywords → angle → caption.
+def build_attempt(client, angles, content, quality, cand, reasons=None, today=None):
+    """برای یک کاندیدا: keywords → رویدادهای تاریخ‌محور → angle → caption.
     برمی‌گرداند (caption, angle_decision, keywords)."""
     try:
         keywords = client.movie_keywords(cand.get("tmdb_id"))
     except TMDbError:
         keywords = []
 
-    angle_decision = angles.choose(cand, keywords)
+    today = today or date.today()
+
+    # رویدادهای تاریخ‌محور (ایده ۸): سالگرد اکران و تولد کارگردان
+    rdate = None
+    try:
+        rd = cand.get("release_date") or ""
+        if rd:
+            rdate = date.fromisoformat(rd[:10])
+    except ValueError:
+        rdate = None
+    cand["_anniversary_today"] = bool(rdate and (rdate.month, rdate.day) == (today.month, today.day))
+    cand["_anniversary_years"] = today.year - rdate.year if (rdate and cand["_anniversary_today"]) else None
+
+    birthday = None
+    if cand.get("director_id"):
+        try:
+            birthday = client.person_birthday(cand["director_id"])
+        except Exception:
+            birthday = None
+    cand["_director_birthday"] = birthday
+    bdate = None
+    try:
+        if birthday:
+            bdate = date.fromisoformat(birthday[:10])
+    except ValueError:
+        bdate = None
+    cand["_birthday_today"] = bool(bdate and (bdate.month, bdate.day) == (today.month, today.day))
+
+    if cand["_anniversary_today"]:
+        cand["_occasion"] = f"🎂 امروز {cand['_anniversary_years']} سال از اکران این فیلم می‌گذرد."
+    elif cand["_birthday_today"]:
+        cand["_occasion"] = f"🎂 امروز تولد {cand.get('director') or 'کارگردان'} است."
+    else:
+        cand["_occasion"] = ""
+
+    angle_decision = angles.choose(cand, keywords, today=today)
 
     director_en = None
     director_imdb_id = None
@@ -96,7 +131,7 @@ def build_attempt(client, angles, content, quality, cand):
         similar = []
 
     caption = content.build(cand, angle_decision, keywords, director_en, director_imdb_id,
-                            similar=similar)
+                            similar=similar, reasons=reasons)
     return caption, angle_decision, keywords
 
 
@@ -155,7 +190,8 @@ def main():
 
     published_title = None
     for idx, (total, breakdown, cand, reasons) in enumerate(ordered_survivors):
-        caption, angle_decision, keywords = build_attempt(client, angles, content, quality, cand)
+        caption, angle_decision, keywords = build_attempt(
+            client, angles, content, quality, cand, reasons=reasons)
 
         qr = quality.check(cand, caption)
         if not qr.passed:

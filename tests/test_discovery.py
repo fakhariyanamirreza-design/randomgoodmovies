@@ -6,12 +6,37 @@ import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.discovery import CandidateDiscovery, _best_poster_from_images, pick_poster  # noqa: E402
+from src.discovery import CandidateDiscovery, _best_poster_from_images, pick_poster, build_candidate  # noqa: E402
 from tests.helpers import base_config, base_history  # noqa: E402
 
 
 def _details(poster=None, language="en"):
     return {"poster_path": poster, "overview": "overview", "title": f"T{language}"}
+
+
+class BuildCandidateTests(unittest.TestCase):
+    def setUp(self):
+        self.cfg = base_config()
+
+    def test_countries_iso_extracted_from_fa_details(self):
+        details_fa = {
+            "id": 7, "title": "هفت", "overview": "خ.", "vote_average": 8.0,
+            "vote_count": 100, "popularity": 5, "genres": [],
+            "release_date": "2010-01-01", "runtime": 120,
+            "production_countries": [{"iso_3166_1": "US", "name": "United States of America"}],
+        }
+        cand = build_candidate("درام‌های جایزه‌گرفته", self.cfg["profiles"][0],
+                               {"id": 7}, details_fa, {"title": "Seven"},
+                               2010, director=None, imdb_id=None, poster_path=None)
+        self.assertEqual(cand["countries_iso"], ["US"])
+        self.assertEqual(cand["countries_fa"], ["آمریکا"])
+
+    def test_countries_iso_empty_when_absent(self):
+        cand = build_candidate("درام‌های جایزه‌گرفته", self.cfg["profiles"][0],
+                               {"id": 8}, {"id": 8, "title": "X", "genres": []},
+                               {"title": "X"}, 2010)
+        self.assertEqual(cand["countries_iso"], [])
+        self.assertEqual(cand["countries_fa"], [])
 
 
 class PosterTests(unittest.TestCase):

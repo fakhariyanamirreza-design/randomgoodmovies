@@ -55,13 +55,16 @@ def base_config():
         },
         "angles": {
             "priority": [
-                "trending_now", "highly_rated", "hidden_gem", "director_spotlight", "award_recognition",
+                "trending_now", "release_anniversary", "director_birthday", "highly_rated",
+                "hidden_gem", "director_spotlight", "award_recognition",
                 "modern_classic", "classic_recommendation", "short_runtime",
                 "influential_film", "decade_recommendation", "genre_recommendation",
                 "weekend_recommendation",
             ],
             "rules": {
                 "trending_now": {},
+                "release_anniversary": {},
+                "director_birthday": {},
                 "highly_rated": {"min_rating": 8.3, "min_vote_count": 3000},
                 "hidden_gem": {"min_rating": 8.0, "max_vote_count": 3000},
                 "director_spotlight": {"min_rating": 7.8},
@@ -79,29 +82,33 @@ def base_config():
         "content": {
             "max_caption_chars": 1024,
             "include_keywords": True,
+            "default_template": "genre_recommendation",
+            "hashtag_mode": "structured",
+            "genre_emoji": {
+                "18": "🎭", "28": "💥", "35": "😂", "878": "👽", "16": "🧸",
+            },
+            "genre_emoji_default": "🎬",
+            "teaser_variants": [
+                "حدس بزن این فیلم درباره‌ی چیه؟ 🧐",
+                "اول حدس بزن، بعد بخون 👇",
+            ],
+            "why_lines": {
+                "trending_now": "چون همین حالا در ترند روز است 🌡️",
+                "highly_rated": "چون امتیاز و رأی بالایی گرفته ⭐",
+                "genre_recommendation": "چون انتخاب مناسبی برای طرفدارانِ این ژانر است 🎯",
+            },
             "templates": {
-                "trending_now": [
-                    "title_fa", "title_en", "blank", "tagline", "trending_line",
-                    "blank", "category", "rating", "genres", "runtime", "country",
-                    "blank", "director_fa", "director_en", "blank", "overview",
-                    "blank", "similar_movies", "blank", "imdb_link", "blank", "hashtags",
-                    "blank", "footer",
-                ],
                 "genre_recommendation": [
                     "title_fa", "title_en", "blank", "tagline", "trending_line",
+                    "occasion_line", "teaser_line",
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
-                    "blank", "similar_movies", "blank", "imdb_link", "blank", "hashtags",
-                    "blank", "footer",
-                ],
-                "hidden_gem": [
-                    "title_fa", "title_en", "blank", "tagline", "trending_line",
-                    "blank", "rating", "genres", "blank", "overview",
-                    "blank", "similar_movies", "blank", "footer",
+                    "blank", "similar_movies", "blank", "imdb_link", "audience_line",
+                    "blank", "hashtags", "blank", "why_line", "blank", "footer",
                 ],
             },
             "block_template": {
-                "title_fa": "🎬 <b>{title_fa}</b> ({year})",
+                "title_fa": "{genre_emoji} <b>{title_fa}</b> ({year}){flag}",
                 "title_en": "↳ {title_en} ({year})",
                 "tagline": "💬 «{tagline}»",
                 "category": "🗂 دسته: {category}",
@@ -117,6 +124,10 @@ def base_config():
                 "footer": "{footer}",
                 "similar_movies": "🎯 <b>فیلم‌های شبیه به این:</b>\n{similar_movies}",
                 "trending_line": "{trending_line}",
+                "occasion_line": "{occasion_line}",
+                "teaser_line": "{teaser_line}",
+                "audience_line": "{audience_line}",
+                "why_line": "{why_line}",
             },
         },
         "quality_gate": {
@@ -163,6 +174,7 @@ def make_candidate(**overrides):
         "tagline": "",
         "trending": False,
         "countries_fa": ["کانادا"],
+        "countries_iso": ["CA"],
     }
     cand.update(overrides)
     return cand
