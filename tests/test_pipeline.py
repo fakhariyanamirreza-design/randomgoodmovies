@@ -114,7 +114,8 @@ class PipelineTests(unittest.TestCase):
                 main_module.CONFIG_PATH = old_config
                 main_module.HISTORY_PATH = old_history
 
-        history = json.load(open(self.env.history_path(), encoding="utf-8"))
+        with open(self.env.history_path(), encoding="utf-8") as f:
+            history = json.load(f)
         self.assertEqual(len(history["posted"]), 1)
         entry = history["posted"][0]
         self.assertEqual(entry["status"], "published")

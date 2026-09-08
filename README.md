@@ -98,6 +98,19 @@ tests/                   # ۴۳ تست unittest (بدون نیاز به شبکه
 classic_recommendation، short_runtime، influential_film، decade_recommendation،
 genre_recommendation، weekend_recommendation.
 
+## پوستر اصلی فیلم
+
+پوستر با اولویت زیر انتخاب می‌شود تا دقیقاً همان پوستر اصلی (که در TMDb/IMDb دیده می‌شود)
+منتشر شود:
+
+1. `poster_path` از `movie/details` با زبان en-US (پوستر اصلی/کانونیکال TMDb)
+2. بهترین پوستر انگلیسی از `movie/images?include_image_language=null,en` (پوستری که بیشترین
+   رأی کاربران TMDb را دارد؛ `vote_count` اولویت دارد)
+3. پوستر فارسی/محلی‌سازی‌شده — فقط آخرین راه، چون می‌تواند نسخه‌ی منطقه‌ای/جایگزین باشد
+
+وقتی پوستر en موجود است، درخواست اضافه به `images` انجام نمی‌شود؛ اما اگر فقط پوستر fa
+هست، حتماً `images` امتحان می‌شود تا نسخه‌ی محلی غلبه نکند.
+
 ## قالب کپشن
 
 `config.json → content.templates` برای هر angle یک الگو دارد (ترتیب بلاک‌ها) و
@@ -137,8 +150,8 @@ python main.py
 ### GitHub Actions
 
 دقیقاً مثل قبل: سه Secret موجود (`TMDB_API_KEY`، `TELEGRAM_BOT_TOKEN`، `TELEGRAM_CHANNEL_ID`)
-کافی‌اند و هیچ Secret جدیدی لازم نیست. Workflow هر ۲ روز یکبار اجرا می‌شود، `data/posted.json`
-را به‌روزرسانی و commit می‌کند (خودکار).
+کافی‌اند و هیچ Secret جدیدی لازم نیست. Workflow هر روز دو بار (ساعت ۹:۱۵ و ۲۱:۱۵ به وقت تهران)
+اجرا می‌شود، `data/posted.json` را به‌روزرسانی و commit می‌کند (خودکار).
 
 ## تست
 
