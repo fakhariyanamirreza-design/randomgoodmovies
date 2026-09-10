@@ -12,6 +12,29 @@ from src.content import format_runtime_fa, keywords_to_hashtags  # noqa: E402
 from tests.helpers import base_config, make_candidate  # noqa: E402
 
 
+def _full_template_config():
+    """config ای که قالب آن همه‌ی بلاک‌های اختیاری (teaser/why) را نیز دارد."""
+    cfg = base_config()
+    cfg["content"]["teaser_variants"] = [
+        "حدس بزن این فیلم درباره‌ی چیه؟ 🧐",
+        "اول حدس بزن، بعد بخون 👇",
+    ]
+    cfg["content"]["why_lines"] = {
+        "trending_now": "چون همین حالا در ترند روز است 🌡️",
+    }
+    cfg["content"]["block_template"]["teaser_line"] = "{teaser_line}"
+    cfg["content"]["block_template"]["why_line"] = "{why_line}"
+    cfg["content"]["templates"]["genre_recommendation"] = [
+        "title_fa", "title_en", "blank", "tagline", "trending_line",
+        "occasion_line", "teaser_line",
+        "blank", "category", "rating", "genres", "runtime", "country",
+        "blank", "director_fa", "director_en", "blank", "overview",
+        "blank", "similar_movies", "blank", "imdb_link", "audience_line",
+        "blank", "hashtags", "blank", "why_line", "blank", "footer",
+    ]
+    return cfg
+
+
 class ContentBuilderTests(unittest.TestCase):
     def setUp(self):
         self.config = base_config()
@@ -143,20 +166,30 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertIn("<b>وردپرس</b> (2010) 🇺🇸", caption)
 
     def test_teaser_line_rotates_deterministically(self):
-        angles = self.angles
+        cfg = _full_template_config()
+        angles = AngleEngine(cfg)
+        builder = ContentBuilder(cfg)
         a = angles.choose(make_candidate(tmdb_id=0, rating=8.5), keywords=[])
         b = angles.choose(make_candidate(tmdb_id=1, rating=8.5), keywords=[])
-        c1 = self.builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
-                                director_imdb_id=None)
-        c2 = self.builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
-                                director_imdb_id=None)
-        c3 = self.builder.build(make_candidate(tmdb_id=1, rating=8.5), b, [], director_en=None,
-                                director_imdb_id=None)
+        c1 = builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
+                           director_imdb_id=None)
+        c2 = builder.build(make_candidate(tmdb_id=0, rating=8.5), a, [], director_en=None,
+                           director_imdb_id=None)
+        c3 = builder.build(make_candidate(tmdb_id=1, rating=8.5), b, [], director_en=None,
+                           director_imdb_id=None)
         self.assertEqual(c1, c2, "انتخاب تیزر باید قطعی باشد")
         self.assertNotEqual(c1.split("\n"), c3.split("\n"), "تیزر بین پست‌های مختلف باید بچرخد")
 
+    def test_teaser_line_not_in_default_template(self):
+        # پس از حذف تیزر از قالب پیش‌فرض هیچ تیزی نباید رندر شود
+        cand = make_candidate(rating=8.5)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertNotIn("حدس بزن", caption)
+        self.assertNotIn("بخون", caption)
+
     def test_teaser_absent_when_no_variants(self):
-        cfg = base_config()
+        cfg = _full_template_config()
         cfg["content"]["teaser_variants"] = []
         builder = ContentBuilder(cfg)
         angle = AngleEngine(cfg).choose(make_candidate(rating=8.5), keywords=[])
@@ -180,14 +213,26 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertIn("🎯 اگر «Inception» را دوست داشتی، این فیلم همان حال و هواست.", caption)
 
     def test_why_line_from_angle_mapping(self):
-        cand = make_candidate(rating=8.5, trending=True)
-        angle = self.angles.choose(cand, keywords=[])
+        cfg = _full_template_config()
+        cfg["content"]["why_lines"] = {
+            "trending_now": "چون همین حالا در ترند روز است 🌡️",
+        }
+        builder = ContentBuilder(cfg)
+        angle = AngleEngine(cfg).choose(make_candidate(rating=8.5, trending=True), keywords=[])
         self.assertEqual(angle.angle, "trending_now")
-        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        caption = builder.build(make_candidate(rating=8.5, trending=True), angle, [],
+                                director_en=None, director_imdb_id=None)
         self.assertIn("چون همین حالا در ترند روز است 🌡️", caption)
 
+    def test_why_line_not_in_default_template(self):
+        cand = make_candidate(rating=8.5, trending=True)
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
+        self.assertNotIn("چون امتیاز", caption)
+        self.assertNotIn("چون همین حالا", caption)
+
     def test_why_line_falls_back_to_reason(self):
-        cfg = base_config()
+        cfg = _full_template_config()
         cfg["content"]["why_lines"] = {}
         builder = ContentBuilder(cfg)
         cand = make_candidate(rating=8.5)
@@ -197,7 +242,7 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertIn("اولین دلیل", caption)
 
     def test_why_line_skips_duplicate_reason(self):
-        cfg = base_config()
+        cfg = _full_template_config()
         cfg["content"]["why_lines"] = {}
         builder = ContentBuilder(cfg)
         cand = make_candidate(rating=8.5)

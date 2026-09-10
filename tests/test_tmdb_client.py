@@ -18,6 +18,16 @@ class StubClient(TMDbClient):
         return self.data
 
 
+class RecordingClient(TMDbClient):
+    def __init__(self, config=None):
+        self.cfg = config or {}
+        self.calls = []
+
+    def _get(self, endpoint, params=None):
+        self.calls.append((endpoint, params))
+        return {"page": 1, "total_pages": 1, "results": []}
+
+
 class TMDbClientTests(unittest.TestCase):
     def test_similar_filters_unrelated_and_low_rating(self):
         """مرد ماهیگیرِ بی‌ربط و فیلمِ کم‌امتیاز نباید بیایند."""
@@ -69,6 +79,32 @@ class TMDbClientTests(unittest.TestCase):
     def test_trending_empty_on_error(self):
         client = StubClient({"results": []})
         self.assertEqual(client.trending("day", 5), [])
+
+    def test_discover_maps_date_filters_to_primary_release_date(self):
+        """بین سال باید primary_release_date.gte/lte شود؛ پارامتر نامعتبر قدیمی نباید برود."""
+        client = RecordingClient()
+        profile = {
+            "name": "شاهکارهای کلاسیک",
+            "with_genres": "18",
+            "vote_average_gte": 8.0,
+            "vote_count_gte": 2000,
+            "release_date_gte": "1970-01-01",
+            "release_date_lte": "1999-12-31",
+        }
+        client.discover(profile, "fa-IR", 1)
+        _, params = client.calls[-1]
+        self.assertEqual(params["primary_release_date.gte"], "1970-01-01")
+        self.assertEqual(params["primary_release_date.lte"], "1999-12-31")
+        self.assertNotIn("release_date_lte", params)
+        self.assertNotIn("release_date.gte", params)
+        self.assertEqual(params["vote_average.gte"], 8.0)
+        self.assertEqual(params["vote_count.gte"], 2000)
+        self.assertEqual(params["with_genres"], "18")
+
+    def test_discover_respects_profile_sort_by(self):
+        client = RecordingClient()
+        client.discover({"sort_by": "vote_average.desc"}, "fa-IR", 1)
+        self.assertEqual(client.calls[-1][1]["sort_by"], "vote_average.desc")
 
 
 if __name__ == "__main__":

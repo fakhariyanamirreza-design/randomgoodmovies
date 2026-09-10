@@ -88,23 +88,14 @@ def base_config():
                 "18": "🎭", "28": "💥", "35": "😂", "878": "👽", "16": "🧸",
             },
             "genre_emoji_default": "🎬",
-            "teaser_variants": [
-                "حدس بزن این فیلم درباره‌ی چیه؟ 🧐",
-                "اول حدس بزن، بعد بخون 👇",
-            ],
-            "why_lines": {
-                "trending_now": "چون همین حالا در ترند روز است 🌡️",
-                "highly_rated": "چون امتیاز و رأی بالایی گرفته ⭐",
-                "genre_recommendation": "چون انتخاب مناسبی برای طرفدارانِ این ژانر است 🎯",
-            },
             "templates": {
                 "genre_recommendation": [
                     "title_fa", "title_en", "blank", "tagline", "trending_line",
-                    "occasion_line", "teaser_line",
+                    "occasion_line",
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
                     "blank", "similar_movies", "blank", "imdb_link", "audience_line",
-                    "blank", "hashtags", "blank", "why_line", "blank", "footer",
+                    "blank", "hashtags", "blank", "footer",
                 ],
             },
             "block_template": {
@@ -125,9 +116,7 @@ def base_config():
                 "similar_movies": "🎯 <b>فیلم‌های شبیه به این:</b>\n{similar_movies}",
                 "trending_line": "{trending_line}",
                 "occasion_line": "{occasion_line}",
-                "teaser_line": "{teaser_line}",
                 "audience_line": "{audience_line}",
-                "why_line": "{why_line}",
             },
         },
         "quality_gate": {

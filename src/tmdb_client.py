@@ -52,14 +52,20 @@ class TMDbClient:
     def discover(self, profile, language, page=1, sort_by="popularity.desc", exclude_adult="false"):
         params = {
             "language": language,
-            "sort_by": sort_by,
+            "sort_by": profile.get("sort_by") or sort_by,
             "include_adult": exclude_adult,
             "page": page,
         }
-        for key in ("with_genres", "vote_average_gte", "vote_count_gte",
-                    "release_date_gte", "release_date_lte"):
+        # نگاشت دقیق به پارامترهای valid تی‌ام‌دی‌بی؛ بین سال باید primary_release_date باشد
+        param_map = {
+            "with_genres": "with_genres",
+            "vote_average_gte": "vote_average.gte",
+            "vote_count_gte": "vote_count.gte",
+            "release_date_gte": "primary_release_date.gte",
+            "release_date_lte": "primary_release_date.lte",
+        }
+        for key, tmdb_param in param_map.items():
             if key in profile:
-                tmdb_param = key.replace("_gte", ".gte")
                 params[tmdb_param] = profile[key]
         return self._get("discover/movie", params)
 
