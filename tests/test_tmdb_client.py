@@ -80,6 +80,28 @@ class TMDbClientTests(unittest.TestCase):
         client = StubClient({"results": []})
         self.assertEqual(client.trending("day", 5), [])
 
+    def test_trailer_picks_official_youtube_trailer(self):
+        data = {"results": [
+            {"key": "teaser1", "site": "YouTube", "type": "Teaser", "official": True},
+            {"key": "off1", "site": "YouTube", "type": "Trailer", "official": True, "size": 720},
+            {"key": "nonoff1", "site": "YouTube", "type": "Trailer", "official": False, "size": 1080},
+            {"key": "vimeo1", "site": "Vimeo", "type": "Trailer", "official": True},
+        ]}
+        client = StubClient(data)
+        self.assertEqual(client.movie_trailer(240), "off1",
+                         "اولویت با تریلر رسمی یوتیوب است (نه یوتیوب غیررسمی با وضوح بالاتر)")
+
+    def test_trailer_none_when_no_youtube_trailer(self):
+        client = StubClient({"results": [
+            {"key": "teaser1", "site": "YouTube", "type": "Teaser"},
+            {"key": "vimeo1", "site": "Vimeo", "type": "Trailer"},
+        ]})
+        self.assertIsNone(client.movie_trailer(240))
+
+    def test_trailer_none_on_error(self):
+        client = StubClient({"errors": []})
+        self.assertIsNone(client.movie_trailer(240))
+
     def test_discover_maps_date_filters_to_primary_release_date(self):
         """بین سال باید primary_release_date.gte/lte شود؛ پارامتر نامعتبر قدیمی نباید برود."""
         client = RecordingClient()

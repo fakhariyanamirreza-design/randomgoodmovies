@@ -55,6 +55,22 @@
     "dry_run": false
   },
 
+  "trailer": {
+    "_help": "یک روز بعد از پست معرفی، پست جدا برای تریلر فیلم منتشر می‌شود (از /movie/{id}/videos تی‌ام‌دی‌بی؛ رایگان). caption با placeholders {title_fa} {post_link} {trailer_url} {footer} ساخته می‌شود؛ channel_handle برای لینک پست معرفی (اگر خالی بود از TELEGRAM_CHANNEL_ID حدس زده می‌شود).",
+    "enabled": true,
+    "after_days": 1,
+    "max_per_run": 1,
+    "channel_handle": "@RandomGoodMovies",
+    "caption": [
+      "🎬 تریلر فیلم {title_fa}",
+      "",
+      "📄 پست معرفی فیلم: {post_link}",
+      "🎬 تماشای تریلر: {trailer_url}",
+      "",
+      "{footer}"
+    ]
+  },
+
   "candidate_pool": {
     "target_per_profile": 8,
     "max_pages_per_profile": 3,
@@ -227,13 +243,11 @@
         "imdb_link",
         "audience_line",
         "blank",
-        "hashtags",
-        "blank",
         "footer"
       ]
     },
     "block_template": {
-      "title_fa": "{genre_emoji} <b>{title_fa}</b> ({year}){flag}",
+      "title_fa": "<b>{title_fa}</b> ({year}){flag}",
       "title_en": "↳ {title_en} ({year})",
       "tagline": "💬 «{tagline}»",
       "category": "🗂 دسته: {category}",

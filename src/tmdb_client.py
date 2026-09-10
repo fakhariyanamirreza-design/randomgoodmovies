@@ -82,6 +82,25 @@ class TMDbClient:
         data = self._get(f"movie/{movie_id}/keywords")
         return [k.get("name") for k in data.get("keywords", [])]
 
+    def movie_trailer(self, movie_id):
+        """بهترین تریلر یوتیوب فیلم از /movie/{id}/videos (رایگان، بدون LLM).
+
+        اولویت: تریلر رسمیِ یوتیوب، سپس هر تریلر یوتیوب (بر اساس وضوح).
+        برمی‌گرداند: stringی YouTube key (مثل 'abc123') یا None اگر تریلر مناسبی نباشد.
+        """
+        try:
+            data = self._get(f"movie/{movie_id}/videos", {"language": "en-US"})
+        except TMDbError:
+            return None
+        videos = [
+            v for v in (data.get("results") or [])
+            if v.get("site") == "YouTube" and (v.get("type") or "").lower() == "trailer"
+        ]
+        if not videos:
+            return None
+        best = max(videos, key=lambda v: (bool(v.get("official")), v.get("size") or 0))
+        return best.get("key")
+
     def movie_similar(self, movie_id, genres=None, language="en-US", limit=3):
         """۳ فیلم واقعاً مشابه از /movie/{id}/similar (رایگان است).
 

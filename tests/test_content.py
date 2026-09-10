@@ -30,7 +30,7 @@ def _full_template_config():
         "blank", "category", "rating", "genres", "runtime", "country",
         "blank", "director_fa", "director_en", "blank", "overview",
         "blank", "similar_movies", "blank", "imdb_link", "audience_line",
-        "blank", "hashtags", "blank", "why_line", "blank", "footer",
+        "blank", "why_line", "blank", "footer",
     ]
     return cfg
 
@@ -147,17 +147,12 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertNotIn("کارگردان", caption)
         self.assertNotIn("ژانر:", caption)
 
-    def test_genre_emoji_from_config(self):
+    def test_title_has_no_genre_emoji(self):
         cand = make_candidate(genres=[28], genre_names_fa=["اکشن"], rating=8.5)
         angle = self.angles.choose(cand, keywords=[])
         caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
-        self.assertIn("💥 <b>وردپرس</b>", caption)
-
-    def test_genre_emoji_default_when_unknown(self):
-        cand = make_candidate(genres=[9999], genre_names_fa=["عجیب"], rating=8.5)
-        angle = self.angles.choose(cand, keywords=[])
-        caption = self.builder.build(cand, angle, [], director_en=None, director_imdb_id=None)
-        self.assertIn("🎬 <b>وردپرس</b>", caption)
+        self.assertNotIn("💥", caption)
+        self.assertIn("<b>وردپرس</b>", caption)
 
     def test_title_has_flag_and_year(self):
         cand = make_candidate(countries_iso=["US"], countries_fa=["آمریکا"], rating=8.5)
@@ -197,12 +192,11 @@ class ContentBuilderTests(unittest.TestCase):
                                 director_imdb_id=None)
         self.assertNotIn("حدس بزن", caption)
 
-    def test_structured_hashtags(self):
+    def test_no_hashtags_in_default_template(self):
         cand = make_candidate(genres=[18], genre_names_fa=["درام"], year=2010, era="2010s")
         angle = self.angles.choose(cand, keywords=[])
         caption = self.builder.build(cand, angle, ["whatever"], director_en=None, director_imdb_id=None)
-        self.assertIn("#درام #2010 #دهه_۲۰۱۰", caption)
-        self.assertNotIn("#whatever", caption)
+        self.assertNotIn("#", caption, "هشتگ‌ها نباید در قالب پیش‌فرض باشند")
 
     def test_audience_line_from_top_similar(self):
         cand = make_candidate()
@@ -295,7 +289,6 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertIn("\n\n", caption, "خط خالی باید حفظ شود، نه این‌که همه‌چیز یک خط شود")
         self.assertGreater(len(caption.split("\n")), 5)
         self.assertIn("فیلم‌های شبیه به این", caption)
-        self.assertIn("#درام", caption)
         self.assertIn("کانال تست", caption, "footer نباید با کوتاه‌کردن از بین برود")
 
     # بلاک‌های جدید هم config-driven هستند: اگر قالب خالی/حذف شد هیچ بلاکی نشکند

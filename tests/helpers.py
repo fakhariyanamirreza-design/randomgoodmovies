@@ -95,11 +95,11 @@ def base_config():
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
                     "blank", "similar_movies", "blank", "imdb_link", "audience_line",
-                    "blank", "hashtags", "blank", "footer",
+                    "blank", "footer",
                 ],
             },
             "block_template": {
-                "title_fa": "{genre_emoji} <b>{title_fa}</b> ({year}){flag}",
+                "title_fa": "<b>{title_fa}</b> ({year}){flag}",
                 "title_en": "↳ {title_en} ({year})",
                 "tagline": "💬 «{tagline}»",
                 "category": "🗂 دسته: {category}",

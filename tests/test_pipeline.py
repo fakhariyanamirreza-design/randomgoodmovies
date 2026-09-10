@@ -8,6 +8,7 @@ import os
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timedelta, timezone
 from unittest import mock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -61,6 +62,9 @@ class FakeTMDbClient:
 
     def movie_keywords(self, movie_id):
         return ["شناخته_شده", "cannes"]
+
+    def movie_trailer(self, movie_id):
+        return f"trailer_{movie_id}"
 
     def movie_similar(self, movie_id, genres=None, language="en-US", limit=3):
         return [
@@ -211,6 +215,61 @@ class PipelineTests(unittest.TestCase):
                 f"هیچ قالب کپشنی برای angle {angle} تعریف نشده")
         self.assertIn("diversity", cfg)
         self.assertIn("quality_gate", cfg)
+        # پیکربندی تریلر باید placeholderهای لازم را داشته باشد
+        trailer_caption = cfg["trailer"]["caption"]
+        self.assertIn("{title_fa}", "".join(trailer_caption))
+        self.assertIn("{post_link}", "".join(trailer_caption))
+        self.assertGreaterEqual(int(cfg["trailer"]["after_days"]), 1)
+
+    def test_trailer_publish_flow_for_stale_posts(self):
+        """پست معرفیِ قدیمی‌تر از after_days باید تریلرِ خود را به‌صورت پست جدا منتشر کند."""
+        from src.publisher import TelegramPublisher
+        from src.tmdb_client import TMDbClient
+        from main import publish_pending_trailers, build_trailer_caption
+
+        cfg = real_config()
+        cfg["trailer"]["after_days"] = 1
+        cfg["posting"]["dry_run"] = True
+        now = datetime.now(timezone.utc)
+
+        history = {"posted": [
+            {
+                "id": 7, "title": "قدیمی", "title_fa": "قدیمی", "title_en": "Old",
+                "status": "published", "message_id": 123,
+                "poster": "/p7.jpg",
+                "posted_at": (now - timedelta(days=3)).isoformat(),
+            },
+            {
+                "id": 8, "title": "تازه", "title_fa": "تازه", "title_en": "New",
+                "status": "published", "message_id": 124,
+                "poster": "/p8.jpg",
+                "posted_at": now.isoformat(),
+            },
+        ]}
+
+        class RecordingTrailerClient(FakeTMDbClient):
+            def __init__(self, *a, **k):
+                self.trailer_calls = []
+
+            def movie_trailer(self, movie_id):
+                self.trailer_calls.append(movie_id)
+                return f"tr{movie_id}"
+
+        client = RecordingTrailerClient()
+        publisher = TelegramPublisher("fake", "@fake", cfg)
+
+        count = publish_pending_trailers(client, publisher, cfg, history, now=now)
+        self.assertEqual(count, 1, "فقط پست ۳ روزِ قدیمی باید تریلر بگیرد")
+        self.assertEqual(client.trailer_calls, [7])
+        self.assertIn("trailer_posted_at", history["posted"][0])
+        self.assertNotIn("trailer_posted_at", history["posted"][1])
+
+        # لینک پست معرفی و اسم فیلم در کپشن تریلر آمده
+        caption = build_trailer_caption(
+            cfg, history["posted"][0], "tr7", "https://t.me/@RandomGoodMovies/123")
+        self.assertIn("قدیمی", caption)
+        self.assertIn("https://t.me/@RandomGoodMovies/123", caption)
+        self.assertIn("عضو", caption)
 
 
 if __name__ == "__main__":
