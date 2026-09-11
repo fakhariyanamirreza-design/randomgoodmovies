@@ -64,7 +64,7 @@
   "trailer": {
     "_help": "یک روز بعد از پست معرفی، پست جدا برای تریلر فیلم منتشر می‌شود (از /movie/{id}/videos تی‌ام‌دی‌بی؛ رایگان). caption با placeholders {title_fa} {post_link} {trailer_url} {footer} ساخته می‌شود؛ channel_handle برای لینک پست معرفی (اگر خالی بود از TELEGRAM_CHANNEL_ID حدس زده می‌شود).",
     "enabled": true,
-    "after_days": 0,
+    "after_days": 1,
     "max_per_run": 1,
     "channel_handle": "@RandomGoodMovies",
     "caption": [
