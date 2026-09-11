@@ -1,0 +1,602 @@
+[
+  {
+    "movie": "The Shawshank Redemption",
+    "imdb_url": "https://www.imdb.com/title/tt0111161/",
+    "quote": "Hope is a good thing, maybe the best of things, and no good thing ever dies.",
+    "quote_fa": "امید چیز خوبی است، شاید بهترین چیزها؛ و هیچ چیز خوبی هرگز نمی‌میرد."
+  },
+  {
+    "movie": "The Godfather",
+    "imdb_url": "https://www.imdb.com/title/tt0068646/",
+    "quote": "I'm gonna make him an offer he can't refuse.",
+    "quote_fa": "دارم براش پیشنهادی آماده می‌کنم که نمی‌تونه ردش کنه."
+  },
+  {
+    "movie": "The Dark Knight",
+    "imdb_url": "https://www.imdb.com/title/tt0468569/",
+    "quote": "Why so serious?",
+    "quote_fa": "چرا انقدر جدی؟"
+  },
+  {
+    "movie": "Pulp Fiction",
+    "imdb_url": "https://www.imdb.com/title/tt0110912/",
+    "quote": "The path of the righteous man is beset on all sides by the inequities of the selfish and the tyranny of evil men.",
+    "quote_fa": "راه مرد درستکار از هر سو به بی‌عدالتی خودخواهان و ستم پلیدان احاطه شده است."
+  },
+  {
+    "movie": "Forrest Gump",
+    "imdb_url": "https://www.imdb.com/title/tt0109830/",
+    "quote": "Life was like a box of chocolates. You never know what you're gonna get.",
+    "quote_fa": "زندگی مثل جعبه شکلات بود؛ هرگز نمی‌فهمی چه چیزی گیرت می‌آید."
+  },
+  {
+    "movie": "Titanic",
+    "imdb_url": "https://www.imdb.com/title/tt0120338/",
+    "quote": "I'm the king of the world!",
+    "quote_fa": "من پادشاه دنیام!"
+  },
+  {
+    "movie": "Gladiator",
+    "imdb_url": "https://www.imdb.com/title/tt0172495/",
+    "quote": "Are you not entertained?",
+    "quote_fa": "سرگرم نشدید؟"
+  },
+  {
+    "movie": "The Matrix",
+    "imdb_url": "https://www.imdb.com/title/tt0133093/",
+    "quote": "There is no spoon.",
+    "quote_fa": "هیچ قاشقی وجود ندارد."
+  },
+  {
+    "movie": "The Matrix",
+    "imdb_url": "https://www.imdb.com/title/tt0133093/",
+    "quote": "Free your mind.",
+    "quote_fa": "ذهنت را آزاد کن."
+  },
+  {
+    "movie": "Inception",
+    "imdb_url": "https://www.imdb.com/title/tt1375666/",
+    "quote": "You mustn't be afraid to dream a little bigger, darling.",
+    "quote_fa": "نباید از خواب بزرگ‌تر دیدن بترسی، عزیزم."
+  },
+  {
+    "movie": "Interstellar",
+    "imdb_url": "https://www.imdb.com/title/tt0816692/",
+    "quote": "Love is the one thing we're capable of perceiving that transcends dimensions of time and space.",
+    "quote_fa": "عشق تنها چیزی است که می‌توانیم درکش کنیم و از ابعاد زمان و فضا فراتر می‌رود."
+  },
+  {
+    "movie": "Fight Club",
+    "imdb_url": "https://www.imdb.com/title/tt0137523/",
+    "quote": "The first rule of Fight Club is: you do not talk about Fight Club.",
+    "quote_fa": "اولین قانون باشگاه مشت‌زنی: درباره باشگاه مشت‌زنی حرف نمی‌زنی."
+  },
+  {
+    "movie": "The Lord of the Rings: The Fellowship of the Ring",
+    "imdb_url": "https://www.imdb.com/title/tt0120737/",
+    "quote": "You shall not pass!",
+    "quote_fa": "اجازه رد شدن نداری!"
+  },
+  {
+    "movie": "The Lord of the Rings: The Two Towers",
+    "imdb_url": "https://www.imdb.com/title/tt0167261/",
+    "quote": "There is some good in this world, Mr. Frodo. And it's worth fighting for.",
+    "quote_fa": "خیر در این دنیا هست، آقای فرودو؛ و ارزش جنگیدن دارد."
+  },
+  {
+    "movie": "The Lord of the Rings: The Return of the King",
+    "imdb_url": "https://www.imdb.com/title/tt0167260/",
+    "quote": "I can't carry it for you, but I can carry you!",
+    "quote_fa": "نمی‌توانم آن را برایت حمل کنم، اما می‌توانم خودت را حمل کنم!"
+  },
+  {
+    "movie": "Star Wars: Episode IV - A New Hope",
+    "imdb_url": "https://www.imdb.com/title/tt0076759/",
+    "quote": "May the Force be with you.",
+    "quote_fa": "نیرو همراه تو باد."
+  },
+  {
+    "movie": "Star Wars: Episode V - The Empire Strikes Back",
+    "imdb_url": "https://www.imdb.com/title/tt0080684/",
+    "quote": "I am your father.",
+    "quote_fa": "من پدرتم."
+  },
+  {
+    "movie": "Star Wars: Episode VI - Return of the Jedi",
+    "imdb_url": "https://www.imdb.com/title/tt0086190/",
+    "quote": "I am a Jedi, like my father before me.",
+    "quote_fa": "من یک جدای هستم، مانند پدرم پیش از من."
+  },
+  {
+    "movie": "Goodfellas",
+    "imdb_url": "https://www.imdb.com/title/tt0099685/",
+    "quote": "As far back as I can remember, I always wanted to be a gangster.",
+    "quote_fa": "تا جایی که یادم می‌آید، همیشه می‌خواستم گانگستر شوم."
+  },
+  {
+    "movie": "Schindler's List",
+    "imdb_url": "https://www.imdb.com/title/tt0108052/",
+    "quote": "Whoever saves one life, saves the world entire.",
+    "quote_fa": "هر که یک جان را نجات دهد، تمام دنیا را نجات داده است."
+  },
+  {
+    "movie": "The Lion King",
+    "imdb_url": "https://www.imdb.com/title/tt0110357/",
+    "quote": "Remember who you are.",
+    "quote_fa": "به خاطر بسپار کی هستی."
+  },
+  {
+    "movie": "Braveheart",
+    "imdb_url": "https://www.imdb.com/title/tt0112573/",
+    "quote": "They may take our lives, but they'll never take our freedom!",
+    "quote_fa": "شاید جانمان را بگیرند، اما آزادی‌مان را هرگز نخواهند گرفت!"
+  },
+  {
+    "movie": "Dead Poets Society",
+    "imdb_url": "https://www.imdb.com/title/tt0097165/",
+    "quote": "Carpe diem. Seize the day, boys. Make your lives extraordinary.",
+    "quote_fa": "کارپه دیم. روز را غنیمت بشمارید، پسرها؛ و زندگی‌تان را باشکوه کنید."
+  },
+  {
+    "movie": "The Terminator",
+    "imdb_url": "https://www.imdb.com/title/tt0088247/",
+    "quote": "I'll be back.",
+    "quote_fa": "برمی‌گردم."
+  },
+  {
+    "movie": "Terminator 2: Judgment Day",
+    "imdb_url": "https://www.imdb.com/title/tt0103064/",
+    "quote": "Hasta la vista, baby.",
+    "quote_fa": "به امید دیدار، بچه."
+  },
+  {
+    "movie": "Aliens",
+    "imdb_url": "https://www.imdb.com/title/tt0090605/",
+    "quote": "Get away from her, you bitch!",
+    "quote_fa": "ازش دور شو، مادرسگ!"
+  },
+  {
+    "movie": "Alien",
+    "imdb_url": "https://www.imdb.com/title/tt0078748/",
+    "quote": "I can't lie to you about your chances, but you have my sympathies.",
+    "quote_fa": "نمی‌توانم درباره شانس‌هایت بهت دروغ بگویم، اما همدردی‌ام را داری."
+  },
+  {
+    "movie": "Back to the Future",
+    "imdb_url": "https://www.imdb.com/title/tt0088763/",
+    "quote": "Where we're going, we don't need roads.",
+    "quote_fa": "جایی که داریم می‌رویم، به جاده نیاز نداریم."
+  },
+  {
+    "movie": "Jurassic Park",
+    "imdb_url": "https://www.imdb.com/title/tt0107290/",
+    "quote": "Life finds a way.",
+    "quote_fa": "زندگی راهش را پیدا می‌کند."
+  },
+  {
+    "movie": "The Silence of the Lambs",
+    "imdb_url": "https://www.imdb.com/title/tt0102926/",
+    "quote": "I ate his liver with some fava beans and a nice Chianti.",
+    "quote_fa": "جگرش را با کمی لوبیا و یک شیشه شراب خوش‌طعم کیانتی خوردم."
+  },
+  {
+    "movie": "Se7en",
+    "imdb_url": "https://www.imdb.com/title/tt0114369/",
+    "quote": "What's in the box?",
+    "quote_fa": "توی جعبه چیه؟"
+  },
+  {
+    "movie": "The Usual Suspects",
+    "imdb_url": "https://www.imdb.com/title/tt0114814/",
+    "quote": "The greatest trick the Devil ever pulled was convincing the world he didn't exist.",
+    "quote_fa": "بزرگ‌ترین حیله‌ای که شیطان زد، مجاب کردن دنیا بود که وجود ندارد."
+  },
+  {
+    "movie": "American Beauty",
+    "imdb_url": "https://www.imdb.com/title/tt0169547/",
+    "quote": "Remember those posters that said, 'Today is the first day of the rest of your life'?",
+    "quote_fa": "یادت می‌آید آن پوسترها که می‌گفتند «امروز، اولین روز از باقی زندگی توست»؟"
+  },
+  {
+    "movie": "Whiplash",
+    "imdb_url": "https://www.imdb.com/title/tt2582802/",
+    "quote": "Not quite my tempo.",
+    "quote_fa": "هنوز با ریتم من نیست."
+  },
+  {
+    "movie": "Parasite",
+    "imdb_url": "https://www.imdb.com/title/tt6751668/",
+    "quote": "You know what kind of plan never fails? No plan at all.",
+    "quote_fa": "می‌دانی چه نقشه‌ای هرگز شکست نمی‌خورد؟ هیچ نقشه‌ای."
+  },
+  {
+    "movie": "Joker",
+    "imdb_url": "https://www.imdb.com/title/tt7286456/",
+    "quote": "I used to think that my life was a tragedy, but now I realize it's a fucking comedy.",
+    "quote_fa": "قبلاً فکر می‌کردم زندگی‌ام یک تراژدی است، اما حالا می‌فهمم یک کمدی لعنتی است."
+  },
+  {
+    "movie": "Oppenheimer",
+    "imdb_url": "https://www.imdb.com/title/tt15398776/",
+    "quote": "Now I am become Death, the destroyer of worlds.",
+    "quote_fa": "حالا من مرگ شده‌ام، ویرانگر جهان‌ها."
+  },
+  {
+    "movie": "Dune",
+    "imdb_url": "https://www.imdb.com/title/tt1160419/",
+    "quote": "Fear is the mind-killer.",
+    "quote_fa": "ترس، کشنده ذهن است."
+  },
+  {
+    "movie": "No Country for Old Men",
+    "imdb_url": "https://www.imdb.com/title/tt0477348/",
+    "quote": "What's the most you ever lost on a coin toss?",
+    "quote_fa": "بیشترین چیزی که توی شیر یا خط باختی چقدر بوده؟"
+  },
+  {
+    "movie": "There Will Be Blood",
+    "imdb_url": "https://www.imdb.com/title/tt0469494/",
+    "quote": "I drink your milkshake!",
+    "quote_fa": "من میلک‌شیکت را می‌نوشم!"
+  },
+  {
+    "movie": "The Departed",
+    "imdb_url": "https://www.imdb.com/title/tt0407887/",
+    "quote": "I'm the guy who does his job. You must be the other guy.",
+    "quote_fa": "من آن کسی‌ام که کارش را انجام می‌دهد؛ تو باید آن یکی باشی."
+  },
+  {
+    "movie": "Heat",
+    "imdb_url": "https://www.imdb.com/title/tt0113277/",
+    "quote": "Don't let yourself get attached to anything you are not willing to walk out on in 30 seconds flat.",
+    "quote_fa": "به هیچ چیزی دل نبند که حاضر نباشی ظرف سی ثانیه از کنارش رد شوی."
+  },
+  {
+    "movie": "Saving Private Ryan",
+    "imdb_url": "https://www.imdb.com/title/tt0120815/",
+    "quote": "Earn this. Earn it.",
+    "quote_fa": "باید لیاقتش را داشته باشی؛ لیاقتش را پیدا کن."
+  },
+  {
+    "movie": "The Green Mile",
+    "imdb_url": "https://www.imdb.com/title/tt0120689/",
+    "quote": "Don't put that thing over my face, Boss. I's afraid of the dark.",
+    "quote_fa": "اون چیز رو روی صورتم نذار، رئیس؛ از تاریکی می‌ترسم."
+  },
+  {
+    "movie": "Django Unchained",
+    "imdb_url": "https://www.imdb.com/title/tt1853728/",
+    "quote": "I like the way you die, boy.",
+    "quote_fa": "از طرز مردنت خوشم آمد، بچه."
+  },
+  {
+    "movie": "Inglourious Basterds",
+    "imdb_url": "https://www.imdb.com/title/tt0361748/",
+    "quote": "That's a bingo!",
+    "quote_fa": "بینگو شد!"
+  },
+  {
+    "movie": "Reservoir Dogs",
+    "imdb_url": "https://www.imdb.com/title/tt0105236/",
+    "quote": "Are you gonna bark all day, little doggy, or are you gonna bite?",
+    "quote_fa": "می‌خوای تمام روز عوعو کنی، سگ کوچولو، یا می‌خوای گاز بگیری؟"
+  },
+  {
+    "movie": "The Princess Bride",
+    "imdb_url": "https://www.imdb.com/title/tt0093779/",
+    "quote": "Hello. My name is Inigo Montoya. You killed my father. Prepare to die.",
+    "quote_fa": "سلام. اسم من اینیگو مونتویاست. تو پدرم را کشتی. خودت را برای مرگ آماده کن."
+  },
+  {
+    "movie": "The Truman Show",
+    "imdb_url": "https://www.imdb.com/title/tt0120382/",
+    "quote": "Good morning, and in case I don't see ya, good afternoon, good evening, and good night!",
+    "quote_fa": "صبح بخیر؛ و اگر دیگر ندیدمتان، ظهر بخیر، عصر بخیر و شب بخیر!"
+  },
+  {
+    "movie": "Groundhog Day",
+    "imdb_url": "https://www.imdb.com/title/tt0107048/",
+    "quote": "Well, what if there is no tomorrow? There wasn't one today.",
+    "quote_fa": "خب، اگر فردایی وجود نداشته باشد چه؟ امروز هم نداشت."
+  },
+  {
+    "movie": "Good Will Hunting",
+    "imdb_url": "https://www.imdb.com/title/tt0119217/",
+    "quote": "It's not your fault.",
+    "quote_fa": "خطای تو نبود."
+  },
+  {
+    "movie": "A Beautiful Mind",
+    "imdb_url": "https://www.imdb.com/title/tt0268978/",
+    "quote": "Classes will dull your mind, destroy the potential for authentic creativity.",
+    "quote_fa": "کلاس‌های درسی ذهنت را کند می‌کنند و ظرفیت خلاقیت واقعی را نابود می‌کنند."
+  },
+  {
+    "movie": "The Pursuit of Happyness",
+    "imdb_url": "https://www.imdb.com/title/tt0454921/",
+    "quote": "You got a dream, you gotta protect it.",
+    "quote_fa": "وقتی رویا داری، باید ازش محافظت کنی."
+  },
+  {
+    "movie": "The Social Network",
+    "imdb_url": "https://www.imdb.com/title/tt1285016/",
+    "quote": "You know what's cool? A billion dollars.",
+    "quote_fa": "می‌دانی چی باحاله؟ یک میلیارد دلار."
+  },
+  {
+    "movie": "The Big Short",
+    "imdb_url": "https://www.imdb.com/title/tt1596363/",
+    "quote": "Truth is like poetry. And most people fucking hate poetry.",
+    "quote_fa": "حقیقت مثل شعر است؛ و بیشتر آدم‌ها از شعر لعنتی بدشان می‌آید."
+  },
+  {
+    "movie": "Moneyball",
+    "imdb_url": "https://www.imdb.com/title/tt1210166/",
+    "quote": "How can you not be romantic about baseball?",
+    "quote_fa": "چطور می‌شود درباره بیس‌بال احساساتی نشد؟"
+  },
+  {
+    "movie": "Spotlight",
+    "imdb_url": "https://www.imdb.com/title/tt1895587/",
+    "quote": "If it takes a village to raise a child, it takes a village to abuse them.",
+    "quote_fa": "اگر برای بزرگ کردن یک کودک به یک روستا نیاز است، برای آزارش هم به همان روستا نیاز است."
+  },
+  {
+    "movie": "12 Years a Slave",
+    "imdb_url": "https://www.imdb.com/title/tt2024544/",
+    "quote": "I don't want to survive. I want to live.",
+    "quote_fa": "نمی‌خواهم فقط زنده بمانم؛ می‌خواهم زندگی کنم."
+  },
+  {
+    "movie": "Birdman",
+    "imdb_url": "https://www.imdb.com/title/tt2562232/",
+    "quote": "A thing is a thing, not what is said of that thing.",
+    "quote_fa": "یک چیز، همان چیز است؛ نه آنچه درباره‌اش گفته می‌شود."
+  },
+  {
+    "movie": "The Revenant",
+    "imdb_url": "https://www.imdb.com/title/tt1663202/",
+    "quote": "As long as you can still grab a breath, you fight.",
+    "quote_fa": "تا وقتی هنوز می‌توانی نفس بکشی، می‌جنگی."
+  },
+  {
+    "movie": "Mad Max: Fury Road",
+    "imdb_url": "https://www.imdb.com/title/tt1392190/",
+    "quote": "Oh, what a day! What a lovely day!",
+    "quote_fa": "اوه، چه روزی! چه روز فوق‌العاده‌ای!"
+  },
+  {
+    "movie": "The Bourne Identity",
+    "imdb_url": "https://www.imdb.com/title/tt0258463/",
+    "quote": "I can tell you the license plate numbers of all six cars outside. I can tell you that our waitress is left-handed.",
+    "quote_fa": "می‌توانم شماره پلاک هر شش ماشین بیرون را بگویم؛ می‌توانم بگویم پیش‌خدمت‌مان چپ‌دست است."
+  },
+  {
+    "movie": "Mission: Impossible",
+    "imdb_url": "https://www.imdb.com/title/tt0117060/",
+    "quote": "Your mission, should you choose to accept it.",
+    "quote_fa": "مأموریت شما، در صورتی که بپذیرید."
+  },
+  {
+    "movie": "Top Gun",
+    "imdb_url": "https://www.imdb.com/title/tt0092099/",
+    "quote": "I feel the need... the need for speed!",
+    "quote_fa": "احساس نیاز می‌کنم... نیاز به سرعت!"
+  },
+  {
+    "movie": "Rocky",
+    "imdb_url": "https://www.imdb.com/title/tt0075148/",
+    "quote": "Yo, Adrian!",
+    "quote_fa": "یو، ادریان!"
+  },
+  {
+    "movie": "On the Waterfront",
+    "imdb_url": "https://www.imdb.com/title/tt0047296/",
+    "quote": "I coulda had class. I coulda been a contender.",
+    "quote_fa": "می‌توانستم آدم مهمی باشم؛ می‌توانستم یکی از رقبا باشم."
+  },
+  {
+    "movie": "Taxi Driver",
+    "imdb_url": "https://www.imdb.com/title/tt0075314/",
+    "quote": "You talkin' to me?",
+    "quote_fa": "داری با من حرف می‌زنی؟"
+  },
+  {
+    "movie": "The Godfather Part II",
+    "imdb_url": "https://www.imdb.com/title/tt0071562/",
+    "quote": "Keep your friends close, but your enemies closer.",
+    "quote_fa": "دوستانت را نزدیک نگه دار، اما دشمنت را نزدیک‌تر."
+  },
+  {
+    "movie": "Scarface",
+    "imdb_url": "https://www.imdb.com/title/tt0086250/",
+    "quote": "Say hello to my little friend!",
+    "quote_fa": "به رفیق کوچولوم سلام کن!"
+  },
+  {
+    "movie": "The Wolf of Wall Street",
+    "imdb_url": "https://www.imdb.com/title/tt0993846/",
+    "quote": "The name of the game, moving the money from the client's pocket to your pocket.",
+    "quote_fa": "قانون بازی این است: پول را از جیب مشتری به جیب خودت منتقل کن."
+  },
+  {
+    "movie": "The Big Lebowski",
+    "imdb_url": "https://www.imdb.com/title/tt0118715/",
+    "quote": "The Dude abides.",
+    "quote_fa": "دادول می‌ماند."
+  },
+  {
+    "movie": "Fargo",
+    "imdb_url": "https://www.imdb.com/title/tt0116282/",
+    "quote": "You have no call to get snippy with me. I'm just trying to do my job here.",
+    "quote_fa": "حق نداری با من این‌طوری لحن بگیری؛ فقط دارم کارم را می‌کنم."
+  },
+  {
+    "movie": "The Shining",
+    "imdb_url": "https://www.imdb.com/title/tt0081505/",
+    "quote": "Here's Johnny!",
+    "quote_fa": "جانی رسید!"
+  },
+  {
+    "movie": "Psycho",
+    "imdb_url": "https://www.imdb.com/title/tt0054215/",
+    "quote": "We all go a little mad sometimes.",
+    "quote_fa": "همه ما گاهی کمی دیوانه می‌شویم."
+  },
+  {
+    "movie": "Jaws",
+    "imdb_url": "https://www.imdb.com/title/tt0073195/",
+    "quote": "You're gonna need a bigger boat.",
+    "quote_fa": "به یک قایق بزرگ‌تر نیاز داری."
+  },
+  {
+    "movie": "2001: A Space Odyssey",
+    "imdb_url": "https://www.imdb.com/title/tt0062622/",
+    "quote": "I'm sorry, Dave. I'm afraid I can't do that.",
+    "quote_fa": "متأسفم دیو؛ می‌ترسم نتوانم این کار را بکنم."
+  },
+  {
+    "movie": "Blade Runner",
+    "imdb_url": "https://www.imdb.com/title/tt0083658/",
+    "quote": "All those moments will be lost in time, like tears in rain.",
+    "quote_fa": "همه آن لحظه‌ها در زمان گم خواهند شد، مثل اشک‌های زیر باران."
+  },
+  {
+    "movie": "Blade Runner 2049",
+    "imdb_url": "https://www.imdb.com/title/tt1856101/",
+    "quote": "Dying for the right cause is the most human thing we can do.",
+    "quote_fa": "مردن برای هدفی درست، انسانی‌ترین کاری است که می‌توانیم بکنیم."
+  },
+  {
+    "movie": "Raiders of the Lost Ark",
+    "imdb_url": "https://www.imdb.com/title/tt0082971/",
+    "quote": "Snakes! Why did it have to be snakes?",
+    "quote_fa": "مار! چرا حتماً مار بود؟"
+  },
+  {
+    "movie": "E.T. the Extra-Terrestrial",
+    "imdb_url": "https://www.imdb.com/title/tt0083866/",
+    "quote": "E.T. phone home.",
+    "quote_fa": "ای.تی. به خانه تلفن کن."
+  },
+  {
+    "movie": "Ghostbusters",
+    "imdb_url": "https://www.imdb.com/title/tt0087332/",
+    "quote": "Who you gonna call? Ghostbusters!",
+    "quote_fa": "به کی زنگ می‌زنی؟ شکارچیان ارواح!"
+  },
+  {
+    "movie": "The Breakfast Club",
+    "imdb_url": "https://www.imdb.com/title/tt0088847/",
+    "quote": "We're all pretty bizarre. Some of us are just better at hiding it, that's all.",
+    "quote_fa": "همه ما عجیب‌غریبی هستیم؛ فقط بعضی‌ها بهتر از بقیه پنهانش می‌کنند، همین."
+  },
+  {
+    "movie": "Home Alone",
+    "imdb_url": "https://www.imdb.com/title/tt0099785/",
+    "quote": "This is my house. I have to defend it.",
+    "quote_fa": "این خانه من است؛ باید ازش دفاع کنم."
+  },
+  {
+    "movie": "Die Hard",
+    "imdb_url": "https://www.imdb.com/title/tt0095016/",
+    "quote": "Yippee-ki-yay, motherfucker.",
+    "quote_fa": "ییپی‌کی‌یه، مادرسگ."
+  },
+  {
+    "movie": "The Fugitive",
+    "imdb_url": "https://www.imdb.com/title/tt0106977/",
+    "quote": "I don't care.",
+    "quote_fa": "برایم مهم نیست."
+  },
+  {
+    "movie": "Cast Away",
+    "imdb_url": "https://www.imdb.com/title/tt0162222/",
+    "quote": "I gotta keep breathing. Because tomorrow the sun will rise. Who knows what the tide could bring?",
+    "quote_fa": "باید به نفس کشیدن ادامه دهم؛ چون فردا خورشید طلوع می‌کند. کی می‌داند جزر و مد چه چیزی با خود می‌آورد؟"
+  },
+  {
+    "movie": "The Martian",
+    "imdb_url": "https://www.imdb.com/title/tt3659388/",
+    "quote": "I'm gonna have to science the shit out of this.",
+    "quote_fa": "باید با علم، هر طور شده از این وضعیت بیرون بیایم."
+  },
+  {
+    "movie": "Gravity",
+    "imdb_url": "https://www.imdb.com/title/tt1454468/",
+    "quote": "I hate space.",
+    "quote_fa": "از فضا متنفرم."
+  },
+  {
+    "movie": "Avatar",
+    "imdb_url": "https://www.imdb.com/title/tt0499549/",
+    "quote": "I see you.",
+    "quote_fa": "می‌بینمت."
+  },
+  {
+    "movie": "Avengers: Endgame",
+    "imdb_url": "https://www.imdb.com/title/tt4154796/",
+    "quote": "Avengers, assemble!",
+    "quote_fa": "انتقام‌جویان، جمع شوید!"
+  },
+  {
+    "movie": "The Dark Knight Rises",
+    "imdb_url": "https://www.imdb.com/title/tt1345836/",
+    "quote": "A hero can be anyone.",
+    "quote_fa": "قهرمان می‌تواند هر کسی باشد."
+  },
+  {
+    "movie": "Black Panther",
+    "imdb_url": "https://www.imdb.com/title/tt1825683/",
+    "quote": "Wakanda forever!",
+    "quote_fa": "واکاندا تا ابد!"
+  },
+  {
+    "movie": "Everything Everywhere All at Once",
+    "imdb_url": "https://www.imdb.com/title/tt6710474/",
+    "quote": "In another life, I would have really liked just doing laundry and taxes with you.",
+    "quote_fa": "در زندگی دیگری، واقعاً دوست داشتم فقط با تو رخت بشویم و مالیات پر کنیم."
+  },
+  {
+    "movie": "Casablanca",
+    "imdb_url": "https://www.imdb.com/title/tt0034583/",
+    "quote": "We'll always have Paris.",
+    "quote_fa": "پاریس را همیشه خواهیم داشت."
+  },
+  {
+    "movie": "Gone with the Wind",
+    "imdb_url": "https://www.imdb.com/title/tt0031381/",
+    "quote": "Frankly, my dear, I don't give a damn.",
+    "quote_fa": "راستش را بخواهی عزیزم، اصلاً برایم مهم نیست."
+  },
+  {
+    "movie": "Citizen Kane",
+    "imdb_url": "https://www.imdb.com/title/tt0033467/",
+    "quote": "Rosebud.",
+    "quote_fa": "رُزباد."
+  },
+  {
+    "movie": "The Wizard of Oz",
+    "imdb_url": "https://www.imdb.com/title/tt0032138/",
+    "quote": "There's no place like home.",
+    "quote_fa": "هیچ جایی مثل خونه نیست."
+  },
+  {
+    "movie": "It's a Wonderful Life",
+    "imdb_url": "https://www.imdb.com/title/tt0038650/",
+    "quote": "Every time a bell rings, an angel gets his wings.",
+    "quote_fa": "هر بار که زنگی به صدا درمی‌آید، یک فرشته بال‌هایش را می‌گیرد."
+  },
+  {
+    "movie": "To Kill a Mockingbird",
+    "imdb_url": "https://www.imdb.com/title/tt0056592/",
+    "quote": "You never really understand a person until you consider things from his point of view.",
+    "quote_fa": "هرگز نمی‌توانی واقعاً یک نفر را بفهمی تا وقتی از دیدگاه او به مسائل نگاه کرده باشی."
+  },
+  {
+    "movie": "12 Angry Men",
+    "imdb_url": "https://www.imdb.com/title/tt0050083/",
+    "quote": "It's not easy to raise my hand and send a boy off to die without talking about it first.",
+    "quote_fa": "آسان نیست که دستم را بالا ببرم و بدون گفت‌وگو درباره‌اش، پسری را راهی مرگ کنم."
+  }
+]

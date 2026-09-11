@@ -28,11 +28,12 @@ class TelegramPublisher:
         self.max_retries = self.cfg.get("max_retries", 2)
         self.rate_limit_sleep = self.cfg.get("rate_limit_sleep_seconds", 1.0)
 
-    def send_photo(self, caption, poster_path, dry_run=False):
-        if not poster_path:
+    def send_photo(self, caption, poster_path, dry_run=False, photo_url=None):
+        if not poster_path and not photo_url:
             raise TelegramPublishError("پوستری برای این فیلم پیدا نشد.")
 
-        photo_url = f"https://image.tmdb.org/t/p/{self.photo_size}{poster_path}"
+        if not photo_url:
+            photo_url = f"https://image.tmdb.org/t/p/{self.photo_size}{poster_path}"
         url = f"https://api.telegram.org/bot{self.bot_token}/sendPhoto"
         payload = {
             "chat_id": self.channel_id,

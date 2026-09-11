@@ -21,11 +21,13 @@ from src.history import HistoryMemory
 from src.persistence import load_json, load_history, save_history
 from src.publisher import TelegramPublisher
 from src.quality import QualityGate
+from src.quotes import QuoteEngine
 from src.scoring import ScoringEngine
 from src.tmdb_client import TMDbClient, TMDbError
 
 CONFIG_PATH = os.environ.get("CONFIG_PATH", "config.json")
 HISTORY_PATH = os.environ.get("HISTORY_PATH", "data/posted.json")
+QUOTES_PATH = os.environ.get("QUOTES_PATH", "data/movie_quotes.json")
 
 
 def get_env_or_exit():
@@ -236,6 +238,60 @@ def publish_pending_trailers(client, publisher, config, history, now=None):
     return published
 
 
+def publish_daily_quote(client, publisher, config, history, dry_run=False, today=None):
+    """انتشار یک نقل قول سینمایی در روز (اگر امروز قبلاً منتشر نشده باشد)."""
+    tcfg = config.get("quotes", {})
+    if not tcfg.get("enabled", True):
+        return False
+
+    today = today or date.today()
+    # اگر امروز قبلاً نقل قول منتشر شده، دوباره منتشر نمی‌کنیم
+    quotes_posted = history.get("quotes_posted", [])
+    for item in quotes_posted:
+        posted_at = item.get("posted_at", "")
+        try:
+            if datetime.fromisoformat(posted_at).date() == today:
+                return False
+        except (ValueError, TypeError):
+            continue
+
+    quotes_path = os.environ.get("QUOTES_PATH", "data/movie_quotes.json")
+    if not os.path.exists(quotes_path):
+        return False
+
+    qe = QuoteEngine(quotes_path, history)
+    index, quote = qe.next_quote()
+    if quote is None:
+        return False
+
+    footer = config.get("posting", {}).get("channel_footer") or ""
+    photo_size = config.get("publisher", {}).get("photo_size", "w1280")
+    backdrop_url = qe.get_backdrop_url(quote, client, photo_size=photo_size)
+    if not backdrop_url:
+        explain.eprint(f"نقل قول «{quote.get('movie')}» رد شد: عکس افقی پیدا نشد.")
+        return False
+
+    caption = qe.build_caption(quote, footer)
+
+    try:
+        resp = publisher.send_photo(caption, backdrop_url.split("/")[-1],
+                                    dry_run=dry_run, photo_url=backdrop_url)
+    except Exception as exc:
+        explain.eprint(f"انتشار نقل قول شکست خورد: {exc}")
+        return False
+
+    message_id = None
+    if isinstance(resp, dict):
+        if resp.get("dry_run"):
+            message_id = "(dry-run)"
+        elif resp.get("result"):
+            message_id = resp["result"].get("message_id")
+
+    qe.record_published(index, message_id)
+    explain.print_publish_status(True, f"نقل قول: {quote.get('movie')}")
+    return True
+
+
 def main():
     get_env_or_exit()
 
@@ -264,6 +320,10 @@ def main():
     # --- Trailer posts: پست جدا برای تریلرِ پست‌های یک‌روز قدیمی‌تر ---
     published_trailers = publish_pending_trailers(client, publisher, config, history)
     if published_trailers:
+        save_history_safe(history, HISTORY_PATH)
+
+    # --- Daily quote: نقل قول سینمایی روزانه ---
+    if publish_daily_quote(client, publisher, config, history, dry_run=dry_run):
         save_history_safe(history, HISTORY_PATH)
 
     # --- Discover ---

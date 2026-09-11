@@ -55,6 +55,12 @@
     "dry_run": false
   },
 
+  "quotes": {
+    "_help": "نقل‌قول روزانه‌ی سینمایی: هر روز یک پست با عکس افقی (backdrop) از سکانس‌های فیلم + نقل قول فارسی + لینک IMDB. نقل‌قول‌های دارای فحش/رکیک و فیلم‌های بدون عکس افقی رد می‌شوند. نام فایل: data/movie_quotes.json (ترتیب فایل = ترتیب اولویت).",
+    "enabled": true,
+    "daily_cap": 1
+  },
+
   "trailer": {
     "_help": "یک روز بعد از پست معرفی، پست جدا برای تریلر فیلم منتشر می‌شود (از /movie/{id}/videos تی‌ام‌دی‌بی؛ رایگان). caption با placeholders {title_fa} {post_link} {trailer_url} {footer} ساخته می‌شود؛ channel_handle برای لینک پست معرفی (اگر خالی بود از TELEGRAM_CHANNEL_ID حدس زده می‌شود).",
     "enabled": true,
