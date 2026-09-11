@@ -831,6 +831,47 @@
       "poster": "/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
       "status": "published",
       "message_id": 37
+    },
+    {
+      "id": 424,
+      "title": "فهرست شیندلر",
+      "title_fa": "فهرست شیندلر",
+      "title_en": "Schindler's List",
+      "year": 1993,
+      "profile": "شاهکارهای کلاسیک",
+      "genres": [
+        18,
+        36,
+        10752
+      ],
+      "genre_names_fa": [
+        "Drama",
+        "History",
+        "War"
+      ],
+      "director": "استیون اسپیلبرگ",
+      "era": "1990s",
+      "posted_at": "2026-09-11T06:56:04.225334+00:00",
+      "selected_score": 75.86,
+      "score_breakdown": {
+        "quality": 25.07,
+        "novelty": 15.0,
+        "category_diversity": 7.0,
+        "genre_diversity": 9.29,
+        "director_diversity": 10.0,
+        "era_diversity": 6.4,
+        "popularity": 3.1,
+        "surprise": 0.0,
+        "trending": 0.0
+      },
+      "editorial_angle": "highly_rated",
+      "angle_reasons": [
+        "امتیاز 8.6 بالاتر از حداقل 8.3 و رأی کافی"
+      ],
+      "caption": "<b>فهرست شیندلر</b> (1993) 🇺🇸\n↳ Schindler's List (1993)\n\n💬 «Whoever saves one life, saves the world entire.»\n\n🗂 دسته: شاهکارهای کلاسیک\n⭐ امتیاز: 8.6/10\n🎭 ژانر: درام، تاریخی، جنگی\n⏱ مدت‌زمان: 3 ساعت و 15 دقیقه\n🌍 کشور سازنده: آمریکا\n\n🎬 کارگردان: استیون اسپیلبرگ\n↳ <a href=\"https://www.imdb.com/name/nm0000229/\">Steven Spielberg</a>\n\n📝 فیلم فهرست شیندلر، داستان واقعی مقطعی از زندگی «اسکار شیندلر»، سرمایه دار آلمانی در خلال جنگ جهانی دوم است. اسکار شیندلر در ابتدا با استفاده از شرایطی که جنگ فراهم آورده بود، یهودیان را به عنوان کارگر برای کارخانه اش انتخاب می‌کند تا پول کمتری برای استخدام کارگر داده باشد و درآمد بیشتری بدست آورد. او نیز مانند سران حز…\n\n🎯 <b>فیلم‌های شبیه به این:</b>\n• I Still Believe (2020)\n\n🔗 <a href=\"https://www.imdb.com/title/tt0108052/\">صفحه فیلم در IMDB</a>\n🎯 اگر «I Still Believe» را دوست داشتی، این فیلم همان حال و هواست.\n\n📢 عضویت در کانال: @RandomGoodMovies",
+      "poster": "/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
+      "status": "published",
+      "message_id": 39
     }
   ],
   "meta": {
@@ -839,5 +880,13 @@
       "note": "Engagement واقعی تلگرام هنوز در دسترس نیست."
     }
   },
-  "schema_version": 2
+  "schema_version": 2,
+  "quotes_posted": [
+    {
+      "quote_index": 0,
+      "movie": "The Shawshank Redemption",
+      "posted_at": "2026-09-11T06:55:25.851456+00:00",
+      "message_id": 38
+    }
+  ]
 }
