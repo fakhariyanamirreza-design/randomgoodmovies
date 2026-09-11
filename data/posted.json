@@ -960,6 +960,47 @@
       "poster": "/eJGWx219ZcEMVQJhAgMiqo8tYY.jpg",
       "status": "published",
       "message_id": 42
+    },
+    {
+      "id": 13,
+      "title": "فارست گامپ",
+      "title_fa": "فارست گامپ",
+      "title_en": "Forrest Gump",
+      "year": 1994,
+      "profile": "شاهکارهای کلاسیک",
+      "genres": [
+        35,
+        18,
+        10749
+      ],
+      "genre_names_fa": [
+        "Comedy",
+        "Drama",
+        "Romance"
+      ],
+      "director": "رابرت زمکیس",
+      "era": "1990s",
+      "posted_at": "2026-09-11T20:01:48.828992+00:00",
+      "selected_score": 75.53,
+      "score_breakdown": {
+        "quality": 24.92,
+        "novelty": 15.0,
+        "category_diversity": 7.0,
+        "genre_diversity": 9.22,
+        "director_diversity": 10.0,
+        "era_diversity": 6.4,
+        "popularity": 2.98,
+        "surprise": 0.0,
+        "trending": 0.0
+      },
+      "editorial_angle": "highly_rated",
+      "angle_reasons": [
+        "امتیاز 8.5 بالاتر از حداقل 8.3 و رأی کافی"
+      ],
+      "caption": "<b>فارست گامپ</b> (1994) 🇺🇸\n↳ Forrest Gump (1994)\n\n💬 «The world will never be the same once you've seen it through the eyes of Forrest Gump.»\n\n🗂 دسته: شاهکارهای کلاسیک\n⭐ امتیاز: 8.5/10\n🎭 ژانر: کمدی، درام، عاشقانه\n⏱ مدت‌زمان: 2 ساعت و 22 دقیقه\n🌍 کشور سازنده: آمریکا\n\n🎬 کارگردان: رابرت زمکیس\n↳ <a href=\"https://www.imdb.com/name/nm0000709/\">Robert Zemeckis</a>\n\n📝 فارست گامپ مادرزاد دچار اختلالاتی ذهنی و جسمی است. در کورکی به طور معجزه اسایی توانایی راه رفتن را بدست می آورد اما همچنان ضریب هوشی اش بسیار از حد نرمال پایینتر است. مادرش با تلاش فراوان او را به مدرسه می فرستد. بر اساس سلسله ای از حوادث به موفقیتهایی بزرگ دست پیدا می کند. به جنگ ویتنام می رود و به عنوان قهرمانی دست…\n\n🎯 <b>فیلم‌های شبیه به این:</b>\n• The Farewell (2019)\n• The Lego Movie (2014)\n• Paddington (2014)\n\n🔗 <a href=\"https://www.imdb.com/title/tt0109830/\">صفحه فیلم در IMDB</a>\n🎯 اگر «The Farewell» را دوست داشتی، این فیلم همان حال و هواست.\n\n📢 عضویت در کانال: @RandomGoodMovies",
+      "poster": "/Cw4hIUIAmSYfK9QfaUW5igp9La.jpg",
+      "status": "published",
+      "message_id": 43
     }
   ],
   "meta": {
