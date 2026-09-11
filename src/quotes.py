@@ -76,36 +76,55 @@ class QuoteEngine:
             "message_id": message_id,
         })
 
-    def build_caption(self, quote, footer):
-        """ساخت کپشن پست نقل قول."""
+    def build_caption(self, quote, footer, year=None):
+        """ساخت کپشن پست نقل قول. اگر year داده شود کنار نام فیلم می‌آید."""
         movie_name = quote.get("movie", "")
         imdb_url = quote.get("imdb_url", "")
         quote_fa = quote.get("quote_fa", "")
+        movie_label = f"{movie_name} ({year})" if year else movie_name
 
         lines = [
             f"«{quote_fa}»",
             "",
-            f"<a href=\"{imdb_url}\">{movie_name}</a>",
+            f"<a href=\"{imdb_url}\">{movie_label}</a>",
             "",
             footer,
         ]
         return "\n".join(lines)
 
-    def get_backdrop_url(self, quote, tmdb_client, photo_size="w1280"):
-        """دریافت URL عکس افقی (backdrop) از TMDb."""
+    def _find_movie(self, quote, tmdb_client):
+        """جستجوی فیلم در TMDb با imdb_id؛ اولین نتیجه برمی‌گردد (یا None)."""
         imdb_id = quote.get("imdb_url", "").split("/title/")[1].rstrip("/")
         if not imdb_id:
             return None
+        find_result = tmdb_client._get(f"find/{imdb_id}", {"external_source": "imdb_id"})
+        movie_results = (find_result or {}).get("movie_results", [])
+        return movie_results[0] if movie_results else None
 
+    def get_movie_year(self, quote, tmdb_client):
+        """سال ساخت فیلم از پاسخ TMDb (از روی release_date)؛ None اگر پیدا نشد."""
         try:
-            find_result = tmdb_client._get(f"find/{imdb_id}", {"external_source": "imdb_id"})
-            movie_results = find_result.get("movie_results", [])
-            if not movie_results:
-                return None
-            tmdb_id = movie_results[0].get("id")
-            if not tmdb_id:
-                return None
+            movie = self._find_movie(quote, tmdb_client)
         except Exception:
+            return None
+        if not movie:
+            return None
+        release_date = movie.get("release_date") or ""
+        prefix = release_date[:4]
+        if prefix.isdigit():
+            return int(prefix)
+        return None
+
+    def get_backdrop_url(self, quote, tmdb_client, photo_size="w1280"):
+        """دریافت URL عکس افقی (backdrop) از TMDb."""
+        try:
+            movie = self._find_movie(quote, tmdb_client)
+        except Exception:
+            return None
+        if not movie:
+            return None
+        tmdb_id = movie.get("id")
+        if not tmdb_id:
             return None
 
         try:

@@ -276,7 +276,8 @@ def publish_daily_quote(client, publisher, config, history, dry_run=False, today
         explain.eprint(f"نقل قول «{quote.get('movie')}» رد شد: عکس افقی پیدا نشد.")
         return False
 
-    caption = qe.build_caption(quote, footer)
+    year = qe.get_movie_year(quote, client)
+    caption = qe.build_caption(quote, footer, year=year)
 
     try:
         resp = publisher.send_photo(caption, backdrop_url.split("/")[-1],

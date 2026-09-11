@@ -86,14 +86,20 @@ class QuoteEngineTests(unittest.TestCase):
 
     def test_build_caption(self):
         qe = self._engine()
-        caption = qe.build_caption(SAMPLE_QUOTES[0], "📢 عضویت در کانال: @test")
+        caption = qe.build_caption(SAMPLE_QUOTES[0], "📢 عضویت در کانال: @test", year=1994)
         self.assertIn("«امید چیز خوبی است.»", caption)
-        self.assertIn("The Shawshank Redemption", caption)
+        self.assertIn("The Shawshank Redemption (1994)", caption)
         self.assertIn("https://www.imdb.com/title/tt0111161/", caption)
         self.assertIn("@test", caption)
         # ترتیب بلاک‌ها: نقل قول → نام فیلم → footer
         self.assertLess(caption.index("«امید"), caption.index("The Shawshank"))
         self.assertLess(caption.index("The Shawshank"), caption.index("@test"))
+
+    def test_build_caption_without_year(self):
+        qe = self._engine()
+        caption = qe.build_caption(SAMPLE_QUOTES[1], "footer", year=None)
+        self.assertIn("Joker</a>", caption)
+        self.assertNotIn("(", caption)
 
     def test_record_published_and_get_published(self):
         qe = self._engine()
@@ -111,7 +117,7 @@ class FakeTMDb:
     def _get(self, endpoint, params=None):
         self.calls.append((endpoint, params))
         if endpoint.startswith("find/"):
-            return {"movie_results": [{"id": 278}]}
+            return {"movie_results": [{"id": 278, "release_date": "1994-09-23"}]}
         if endpoint.startswith("movie/278/images"):
             return {"backdrops": [
                 {"file_path": "/bd1.jpg", "vote_average": 4.0},
@@ -136,6 +142,28 @@ class BackdropTests(unittest.TestCase):
         endpoints = [c[0] for c in tmdb.calls]
         self.assertIn("find/tt0111161", endpoints)
         self.assertIn("movie/278/images", endpoints)
+
+    def test_get_movie_year_from_release_date(self):
+        dir_path = tempfile.mkdtemp()
+        quotes_path = os.path.join(dir_path, "q.json")
+        write_quotes(quotes_path, SAMPLE_QUOTES)
+        qe = QuoteEngine(quotes_path, {"posted": []})
+        tmdb = FakeTMDb()
+        self.assertEqual(qe.get_movie_year(SAMPLE_QUOTES[0], tmdb), 1994)
+
+    def test_get_movie_year_none_when_missing(self):
+        dir_path = tempfile.mkdtemp()
+        quotes_path = os.path.join(dir_path, "q.json")
+        write_quotes(quotes_path, SAMPLE_QUOTES)
+        qe = QuoteEngine(quotes_path, {"posted": []})
+
+        class NoYear(FakeTMDb):
+            def _get(self, endpoint, params=None):
+                if endpoint.startswith("find/"):
+                    return {"movie_results": [{"id": 278}]}
+                return {"backdrops": []}
+
+        self.assertIsNone(qe.get_movie_year(SAMPLE_QUOTES[0], NoYear()))
 
     def test_get_backdrop_url_none_when_no_backdrop(self):
         dir_path = tempfile.mkdtemp()
@@ -216,7 +244,7 @@ class DailyQuotePublishTest(unittest.TestCase):
         class FakeClient:
             def _get(self, endpoint, params=None):
                 if endpoint.startswith("find/"):
-                    return {"movie_results": [{"id": 1}]}
+                    return {"movie_results": [{"id": 1, "release_date": "2003-12-17"}]}
                 return {"backdrops": [{"file_path": "/bd.jpg", "vote_average": 5.0}]}
 
         calls = []
@@ -235,6 +263,7 @@ class DailyQuotePublishTest(unittest.TestCase):
         self.assertEqual(len(history["quotes_posted"]), 1)
         caption, photo_url = calls[0]
         self.assertIn("Test Movie", caption)
+        self.assertIn("Test Movie (2003)", caption)
         self.assertIn("https://www.imdb.com", caption)
         self.assertIn("bd", photo_url)
 

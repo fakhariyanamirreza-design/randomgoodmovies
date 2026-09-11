@@ -60,7 +60,7 @@ data/
 ├── posted.json          # حافظه / تاریخچه (schema v2)
 └── movie_quotes.json    # نقل‌قول‌های سینمایی (ترتیب = اولویت)
 
-tests/                   # ۱۱۰ تست unittest (بدون نیاز به شبکه)
+tests/                   # ۱۱۳ تست unittest (بدون نیاز به شبکه)
 .github/workflows/publish.yml
 ```
 
@@ -183,6 +183,8 @@ weekend_recommendation.
 
 - منبع: `data/movie_quotes.json` (ترتیب فایل = ترتیب اولویت؛ بعداً قابل گسترش).
 - عکس افقی از `/search` (با `imdb_id`) + `/movie/{id}/images`، انتخابی بر اساس بیشترین رأی.
+- نام فیلم با لینک IMDb و **سال ساخت** (استخراج‌شده از `release_date` تی‌ام‌دی‌بی) نشان داده
+  می‌شود، مثل `The Shawshank Redemption (1994)`.
 - نقل‌قول‌های دارای فحش/رکیک (`src/quotes.py → PROFANITY_FA`) و فیلم‌های بدون عکس افقی
   رد می‌شوند (ثبت هم نمی‌شوند).
 - سقف: یک نقل‌قول در هر روز (`quotes.daily_cap`)، کنترل با `quotes_posted` در تاریخچه.
@@ -230,7 +232,7 @@ python -m unittest discover -s tests
 ```
 
 بخش‌های deterministic (امتیاز، تنوع، حافظه، angle، کپشن، گیت کیفیت، duplicate، تریلر،
-نقل‌قول روزانه) با ۱۱۰ تست بدون نیاز به شبکه پوشش داده شده‌اند.
+نقل‌قول روزانه) با ۱۱۳ تست بدون نیاز به شبکه پوشش داده شده‌اند.
 
 ---
 
