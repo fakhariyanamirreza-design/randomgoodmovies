@@ -270,6 +270,9 @@ class PipelineTests(unittest.TestCase):
         self.assertIn("قدیمی", caption)
         self.assertIn("https://t.me/@RandomGoodMovies/123", caption)
         self.assertIn("عضو", caption)
+        # لینک یوتیوب باید خام و جدا باشد تا تلگرام کارت inline بسازد (نه داخل <a>)
+        self.assertIn("https://www.youtube.com/watch?v=tr7", caption)
+        self.assertNotIn("<a href='https://www.youtube.com", caption)
 
 
 if __name__ == "__main__":

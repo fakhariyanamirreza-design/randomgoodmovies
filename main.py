@@ -156,14 +156,15 @@ def trailer_post_link(config, message_id):
 
 
 def build_trailer_caption(config, entry, trailer_key, post_link):
-    """کپشن پست تریلر: نام فیلم، لینک پست معرفی، لینک تریلر و footer."""
+    """متن پست تریلر: نام فیلم، لینک پست معرفی، لینک خام یوتیوب (برای پخش inline) و footer."""
     tcfg = config.get("trailer", {})
     footer = config.get("posting", {}).get("channel_footer") or ""
     template = tcfg.get("caption") or [
         "🎬 تریلر فیلم {title_fa}",
         "",
         "📄 پست معرفی فیلم: {post_link}",
-        "🎬 تماشای تریلر: {trailer_url}",
+        "",
+        "{trailer_url}",
         "",
         "{footer}",
     ]
@@ -171,11 +172,15 @@ def build_trailer_caption(config, entry, trailer_key, post_link):
         "title_fa": entry.get("title_fa") or entry.get("title") or "",
         "title_en": entry.get("title_en") or "",
         "post_link": (f"<a href='{post_link}'>مشاهده پست</a>" if post_link else "در دسترس نیست"),
-        "trailer_url": f"<a href='https://www.youtube.com/watch?v={trailer_key}'>YouTube</a>",
+        # لینک خام و جداگانه؛ تلگرام به این URL یک کارت ویدیوی پخش‌شدنی inline ضمیمه می‌کند
+        "trailer_url": f"https://www.youtube.com/watch?v={trailer_key}",
         "footer": footer,
     }
     lines = []
     for line in template:
+        if line == "":
+            lines.append("")
+            continue
         try:
             rendered = line.format(**values)
         except (KeyError, IndexError, ValueError):
@@ -223,7 +228,7 @@ def publish_pending_trailers(client, publisher, config, history, now=None):
         caption = build_trailer_caption(config, entry, trailer_key,
                                         trailer_post_link(config, entry.get("message_id")))
         try:
-            resp = publisher.send_photo(caption, entry.get("poster"), dry_run=dry_run)
+            resp = publisher.send_message(caption, dry_run=dry_run)
         except Exception as exc:
             explain.eprint(f"انتشار تری‌لر به تلگرام شکست خورد: {exc}")
             continue

@@ -21,6 +21,8 @@ Select             → قوانین تنوع (hard/soft limit) + انتخاب و
 Choose Angle       → انتخاب زاویه‌ی سردبیری (Highly Rated، Hidden Gem و ...)
 Generate Content   → موتور قالب کپشن به‌ازای هر angle
 Quality Check      → گیت کیفیت (متادیتا + کپشن + کوتاهی)
+Trailer (یک روز بعد) → پست متنی تریلر (لینک خام یوتیوب → پخش inline در تلگرام)
+Daily Quote        → یک نقل‌قول سینمایی در روز (با عکس افقی سکانس)
 Publish            → انتشار به تلگرام با retry محدود
 Save Memory        → ثبت تاریخچه‌ی کامل پست
 ```
@@ -41,7 +43,7 @@ data/posted.json         # حافظه / تاریخچه (schema v2)
 src/
 ├── __init__.py
 ├── common.py            # ژانرها/کشورها + ابزار مشترک
-├── tmdb_client.py       # TMDb Client (retry، timeout، rate limit)
+├── tmdb_client.py       # TMDb Client (retry، timeout، rate limit) + یافتن تریلر
 ├── discovery.py         # Candidate Discovery (ساخت pool)
 ├── history.py           # آنالیز حافظه (شمارش، streak، آخرین استفاده)
 ├── scoring.py           # Editorial Scoring Engine
@@ -50,10 +52,15 @@ src/
 ├── content.py           # Content Builder (موتور قالب)
 ├── quality.py           # Quality Gate
 ├── publisher.py         # Telegram Publisher
+├── quotes.py            # موتور نقل‌قول روزانه (فیلتر فحش + عکس افقی)
 ├── persistence.py       # بارگذاری/ذخیره‌ی JSON + مهاجرت ورودی‌های قدیمی
 └── explain.py           # خروجی توضیح‌پذیر برای لاگ
 
-tests/                   # ۶۳ تست unittest (بدون نیاز به شبکه)
+data/
+├── posted.json          # حافظه / تاریخچه (schema v2)
+└── movie_quotes.json    # نقل‌قول‌های سینمایی (ترتیب = اولویت)
+
+tests/                   # ۱۱۰ تست unittest (بدون نیاز به شبکه)
 .github/workflows/publish.yml
 ```
 
@@ -197,8 +204,8 @@ python main.py
 python -m unittest discover -s tests
 ```
 
-بخش‌های deterministic (امتیاز، تنوع، حافظه، angle، کپشن، گیت کیفیت، duplicate) با ۶۳ تست
-بدون نیاز به شبکه پوشش داده شده‌اند.
+بخش‌های deterministic (امتیاز، تنوع، حافظه، angle، کپشن، گیت کیفیت، duplicate، تریلر،
+نقل‌قول روزانه) با ۱۱۰ تست بدون نیاز به شبکه پوشش داده شده‌اند.
 
 ---
 
