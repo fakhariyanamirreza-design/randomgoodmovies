@@ -67,7 +67,8 @@ class ContentBuilderTests(unittest.TestCase):
         angle = self.angles.choose(cand, keywords=[])
         caption = self.builder.build(cand, angle, [], trailer_url="https://www.youtube.com/watch?v=abc")
         self.assertIn("🎬 تماشای تریلر:", caption)
-        self.assertIn("https://www.youtube.com/watch?v=abc", caption)
+        self.assertIn("<a href='https://www.youtube.com/watch?v=abc'>", caption)
+        self.assertIn("تماشا در یوتیوب", caption)
         # تریلر قبل از footer آمده
         self.assertLess(caption.index("تماشای تریلر"), caption.index("کانال تست"))
 

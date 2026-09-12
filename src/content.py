@@ -162,7 +162,7 @@ class ContentBuilder:
         # لینک تریلر (از /movie/{id}/videos یوتیوب) — داخل همین کپشن معرفی فیلم
         trailer_line = ""
         if trailer_url:
-            trailer_line = f"🎬 تماشای تریلر:\n{trailer_url}"
+            trailer_line = f"🎬 تماشای تریلر: <a href='{trailer_url}'>تماشا در یوتیوب</a>"
 
         return {
             "title_fa": cand.get("title_fa"),

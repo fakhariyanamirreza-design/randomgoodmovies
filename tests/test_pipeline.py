@@ -183,7 +183,9 @@ class PipelineTests(unittest.TestCase):
 
         with mock.patch.object(main_module, "TMDbClient", EmptyFake):
             old_config = main_module.CONFIG_PATH
+            old_history = main_module.HISTORY_PATH
             main_module.CONFIG_PATH = os.path.join(self.env.dir, "config.json")
+            main_module.HISTORY_PATH = self.env.history_path()
             try:
                 with mock.patch.dict(os.environ, {
                     "TMDB_API_KEY": "fake",
@@ -194,6 +196,7 @@ class PipelineTests(unittest.TestCase):
                         main_module.main()
             finally:
                 main_module.CONFIG_PATH = old_config
+                main_module.HISTORY_PATH = old_history
 
         self.assertEqual(ctx.exception.code, 0)
         self.assertFalse(os.path.exists(self.env.history_path()))
