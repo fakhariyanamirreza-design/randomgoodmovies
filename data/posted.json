@@ -832,7 +832,9 @@
       "caption": "<b>اوپنهایمر</b> (2023) 🇬🇧\n↳ Oppenheimer (2023)\n\n💬 «جهان برای همیشه تغییر می‌کند.»\n\n🗂 دسته: درام‌های جایزه‌گرفته\n⭐ امتیاز: 8.0/10\n🎭 ژانر: درام، تاریخی\n⏱ مدت‌زمان: 2 ساعت و 49 دقیقه\n🌍 کشور سازنده: بریتانیا، آمریکا\n\n🎬 کارگردان: کریستوفر نولان\n↳ <a href=\"https://www.imdb.com/name/nm0634240/\">Christopher Nolan</a>\n\n📝 داستان این فیلم با تمرکز روی جولیوس رابرت اوپنهایمر، به ماجرای گروهی از دانشمندان پروژه‌ی منهتن می‌پردازد که بمب‌های اتم استفاده‌شده در شهرهای هیروشیما و ناکازاکی کشور ژاپن را برای ارتش آمریکا تولید کردند. تسلیم امپراطوری ژاپن در پی بمباران اتمی، به جنگ اقیانوس آرام خاتمه داد.\n\n🎯 <b>فیلم‌های شبیه به این:</b>\n• I Still Believe (2020)\n\n🔗 <a href=\"https://www.imdb.com/title/tt15398776/\">صفحه فیلم در IMDB</a>\n🎯 اگر «I Still Believe» را دوست داشتی، این فیلم همان حال و هواست.\n\n📢 عضویت در کانال: @RandomGoodMovies",
       "poster": "/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
       "status": "published",
-      "message_id": 37
+      "message_id": 37,
+      "trailer_posted_at": "2026-09-12T09:34:40+00:00",
+      "trailer_message_id": 44
     },
     {
       "id": 424,
@@ -1001,6 +1003,47 @@
       "poster": "/Cw4hIUIAmSYfK9QfaUW5igp9La.jpg",
       "status": "published",
       "message_id": 43
+    },
+    {
+      "id": 83533,
+      "title": "آواتار : آتش و خاکستر",
+      "title_fa": "آواتار : آتش و خاکستر",
+      "title_en": "Avatar: Fire and Ash",
+      "year": 2025,
+      "profile": "علمی-تخیلی نامتعارف",
+      "genres": [
+        878,
+        12,
+        14
+      ],
+      "genre_names_fa": [
+        "Science Fiction",
+        "Adventure",
+        "Fantasy"
+      ],
+      "director": "جیمز کامرون",
+      "era": "2020s",
+      "posted_at": "2026-09-12T09:35:21.652348+00:00",
+      "selected_score": 77.18,
+      "score_breakdown": {
+        "quality": 21.93,
+        "novelty": 15.0,
+        "category_diversity": 10.0,
+        "genre_diversity": 9.11,
+        "director_diversity": 10.0,
+        "era_diversity": 5.6,
+        "popularity": 5.55,
+        "surprise": 0.0,
+        "trending": 0.0
+      },
+      "editorial_angle": "influential_film",
+      "angle_reasons": [
+        "تأثیرگذار: 4298 رأی و محبوبیت بالا"
+      ],
+      "caption": "<b>آواتار : آتش و خاکستر</b> (2025) 🇺🇸\n↳ Avatar: Fire and Ash (2025)\n\n💬 «The world of Pandora will change forever.»\n\n🗂 دسته: علمی-تخیلی نامتعارف\n⭐ امتیاز: 7.6/10\n🎭 ژانر: علمی-تخیلی، ماجراجویی، فانتزی\n⏱ مدت‌زمان: 3 ساعت و 18 دقیقه\n🌍 کشور سازنده: آمریکا\n\n🎬 کارگردان: جیمز کامرون\n↳ <a href=\"https://www.imdb.com/name/nm0000116/\">James Cameron</a>\n\n📝 پس از مرگ نتیام، خانواده جیک و نیتیری حالا داغدار اوست اما باید خود را برای مقابله با یک قبیله جدید به‌نام قبیله خاکستر آماده کنند.\n\n🎯 <b>فیلم‌های شبیه به این:</b>\n• Alienoid (2022)\n• Spider-Man: Across the Spider-Verse (2023)\n• Fantastic Beasts and Where to Find Them (2016)\n\n🔗 <a href=\"https://www.imdb.com/title/tt1757678/\">صفحه فیلم در IMDB</a>\n🎯 اگر «Alienoid» را دوست داشتی، این فیلم همان حال و هواست.\n\n📢 عضویت در کانال: @RandomGoodMovies",
+      "poster": "/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg",
+      "status": "published",
+      "message_id": 46
     }
   ],
   "meta": {
@@ -1016,6 +1059,12 @@
       "movie": "The Shawshank Redemption",
       "posted_at": "2026-09-11T06:55:25.851456+00:00",
       "message_id": 38
+    },
+    {
+      "quote_index": 1,
+      "movie": "The Godfather",
+      "posted_at": "2026-09-12T09:34:42.631387+00:00",
+      "message_id": 45
     }
   ]
 }
