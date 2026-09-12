@@ -56,26 +56,9 @@
   },
 
   "quotes": {
-    "_help": "نقل‌قول روزانه‌ی سینمایی: هر روز یک پست با عکس افقی (backdrop) از سکانس‌های فیلم + نقل قول فارسی + لینک IMDB. نقل‌قول‌های دارای فحش/رکیک و فیلم‌های بدون عکس افقی رد می‌شوند. نام فایل: data/movie_quotes.json (ترتیب فایل = ترتیب اولویت).",
+    "_help": "نقل‌قول روزانه‌ی سینمایی: هر روز یک پست با عکس افقی (backdrop) از سکانس‌های فیلم + نقل قول فارسی + لینک IMDB (+ سال ساخت). نقل‌قول‌های دارای فحش/رکیک و فیلم‌های بدون عکس افقی رد می‌شوند. نام فایل: data/movie_quotes.json (ترتیب فایل = ترتیب اولویت).",
     "enabled": true,
     "daily_cap": 1
-  },
-
-  "trailer": {
-    "_help": "یک روز بعد از پست معرفی، پست جدا برای تریلر فیلم منتشر می‌شود (از /movie/{id}/videos تی‌ام‌دی‌بی؛ رایگان). پست به‌صورت پیام متنی با لینک خام یوتیوب ارسال می‌شود تا تلگرام کارت ویدیوی پخش‌شدنی (inline) بسازد. caption با placeholders {title_fa} {post_link} {trailer_url} {footer} ساخته می‌شود؛ channel_handle برای لینک پست معرفی (اگر خالی بود از TELEGRAM_CHANNEL_ID حدس زده می‌شود).",
-    "enabled": true,
-    "after_days": 1,
-    "max_per_run": 1,
-    "channel_handle": "@RandomGoodMovies",
-    "caption": [
-      "🎬 تریلر فیلم {title_fa}",
-      "",
-      "📄 پست معرفی فیلم: {post_link}",
-      "",
-      "{trailer_url}",
-      "",
-      "{footer}"
-    ]
   },
 
   "candidate_pool": {
@@ -219,7 +202,7 @@
   },
 
   "content": {
-    "_help": "یک قالب استاندارد (genre_recommendation) برای همه‌ی angleها؛ چیدمان یکدستِ هدر و بدنه (ایده‌ی ۵). بلاک‌ها: title_fa,title_en,tagline,trending_line,occasion_line,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,audience_line,hashtags,footer. 'blank' خط خالی است. ایموجی ژانر (ایده ۱)، هشتگ سبک/ساختارمند (ایده ۴) و مخاطب‌شناس (ایده ۷) از همین بخش قابل تنظیم‌اند.",
+    "_help": "یک قالب استاندارد (genre_recommendation) برای همه‌ی angleها؛ چیدمان یکدستِ هدر و بدنه (ایده‌ی ۵). بلاک‌ها: title_fa,title_en,tagline,trending_line,occasion_line,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,audience_line,trailer_line,hashtags,footer. 'blank' خط خالی است. ایموجی ژانر (ایده ۱)، هشتگ سبک/ساختارمند (ایده ۴) و مخاطب‌شناس (ایده ۷) از همین بخش قابل تنظیم‌اند. trailer_line لینک تریلر یوتیوب (از /movie/{id}/videos) را داخل کپشن معرفی فیلم می‌گذارد؛ اگر تریلری نبود خودکار حذف می‌شود.",
     "max_caption_chars": 1024,
     "include_keywords": true,
     "default_template": "genre_recommendation",
@@ -249,6 +232,7 @@
         "blank",
         "imdb_link",
         "audience_line",
+        "trailer_line",
         "blank",
         "footer"
       ]
@@ -270,6 +254,7 @@
       "trending_line": "{trending_line}",
       "occasion_line": "{occasion_line}",
       "audience_line": "{audience_line}",
+      "trailer_line": "{trailer_line}",
       "hashtags": "{hashtags}",
       "footer": "{footer}"
     }

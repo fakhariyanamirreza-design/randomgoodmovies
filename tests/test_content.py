@@ -62,6 +62,33 @@ class ContentBuilderTests(unittest.TestCase):
         self.assertIn("8.2", caption)
         self.assertIn("2010", caption)
 
+    def test_trailer_line_inside_caption_when_present(self):
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], trailer_url="https://www.youtube.com/watch?v=abc")
+        self.assertIn("🎬 تماشای تریلر:", caption)
+        self.assertIn("https://www.youtube.com/watch?v=abc", caption)
+        # تریلر قبل از footer آمده
+        self.assertLess(caption.index("تماشای تریلر"), caption.index("کانال تست"))
+
+    def test_trailer_line_absent_when_none(self):
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        caption = self.builder.build(cand, angle, [], trailer_url=None)
+        self.assertNotIn("تماشای تریلر", caption)
+        self.assertNotIn("youtube.com", caption)
+
+    def test_trailer_line_hidden_when_no_trailer_block_template(self):
+        cfg = base_config()
+        cfg["content"]["templates"]["genre_recommendation"] = [
+            "title_fa", "title_en", "blank", "footer",
+        ]
+        builder = ContentBuilder(cfg)
+        cand = make_candidate()
+        angle = self.angles.choose(cand, keywords=[])
+        caption = builder.build(cand, angle, [], trailer_url="https://www.youtube.com/watch?v=abc")
+        self.assertNotIn("youtube.com", caption)
+
     def test_hidden_gem_template_used(self):
         cand = make_candidate(rating=8.2, vote_count=1000, tmdb_id=999)
         angle = self.angles.choose(cand, keywords=[])

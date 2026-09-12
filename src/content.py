@@ -84,7 +84,7 @@ class ContentBuilder:
         return " ".join(tags)
 
     def _prepare_values(self, cand, keywords, director_en, director_imdb_id, similar=None,
-                        angle_decision=None, reasons=None):
+                        angle_decision=None, reasons=None, trailer_url=None):
         rating = float(cand.get("rating", 0) or 0)
         genres = "، ".join(GENRE_FA.get(gid, gname) for gid, gname in
                            zip(cand.get("genres") or [], cand.get("genre_names_fa") or []))
@@ -159,6 +159,11 @@ class ContentBuilder:
         if not why_line and reasons:
             why_line = next((r for r in reasons if r and r != "قبلاً منتشر نشده"), "")
 
+        # لینک تریلر (از /movie/{id}/videos یوتیوب) — داخل همین کپشن معرفی فیلم
+        trailer_line = ""
+        if trailer_url:
+            trailer_line = f"🎬 تماشای تریلر:\n{trailer_url}"
+
         return {
             "title_fa": cand.get("title_fa"),
             "title_en": cand.get("title_en"),
@@ -182,6 +187,7 @@ class ContentBuilder:
             "similar_movies": "\n".join(similar_lines),
             "trending_line": "🔥 همین حالا در فهرست فیلم‌های ترند روز TMDb است" if cand.get("trending") else "",
             "hashtags": hashtags,
+            "trailer_line": trailer_line,
             "footer": self.cfg.get("posting", {}).get("channel_footer") or "",
         }
 
@@ -214,6 +220,7 @@ class ContentBuilder:
         "why_line": "why_line",
         "imdb_link": "imdb_link",
         "hashtags": "hashtags",
+        "trailer_line": "trailer_line",
         "footer": "footer",
     }
 
@@ -241,14 +248,15 @@ class ContentBuilder:
         return caption, lines
 
     def build(self, cand, angle_decision, keywords, director_en=None, director_imdb_id=None,
-              similar=None, reasons=None):
+              similar=None, reasons=None, trailer_url=None):
         angle = angle_decision.angle
         template = (self.templates.get(angle)
                     or self.templates.get(self.default_template)
                     or self.templates.get("genre_recommendation")
                     or [])
         values = self._prepare_values(cand, keywords, director_en, director_imdb_id,
-                                      similar, angle_decision, reasons)
+                                      similar, angle_decision, reasons,
+                                      trailer_url=trailer_url)
         max_chars = self.cfg.get("content", {}).get("max_caption_chars", 1024)
 
         caption, lines = self._compose(template, values)

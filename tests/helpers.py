@@ -95,7 +95,7 @@ def base_config():
                     "blank", "category", "rating", "genres", "runtime", "country",
                     "blank", "director_fa", "director_en", "blank", "overview",
                     "blank", "similar_movies", "blank", "imdb_link", "audience_line",
-                    "blank", "footer",
+                    "trailer_line", "blank", "footer",
                 ],
             },
             "block_template": {
@@ -117,6 +117,7 @@ def base_config():
                 "trending_line": "{trending_line}",
                 "occasion_line": "{occasion_line}",
                 "audience_line": "{audience_line}",
+                "trailer_line": "{trailer_line}",
             },
         },
         "quality_gate": {

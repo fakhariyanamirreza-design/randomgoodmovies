@@ -5,7 +5,7 @@ import os
 import sys
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from unittest import mock
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -184,6 +184,46 @@ class DailyCapTests(unittest.TestCase):
     def test_daily_cap_config_respected(self):
         cfg = {"quotes": {"enabled": True, "daily_cap": 1}}
         self.assertEqual(cfg["quotes"]["daily_cap"], 1)
+
+
+class RunRotationTests(unittest.TestCase):
+    """روتاسیون «هر اجرا فقط یک نوع پست»: صبح نقل‌قول، شب فیلم."""
+
+    def _decide(self, history, quotes_on=True, today=None):
+        from main import decide_run_content
+        cfg = {"quotes": {"enabled": quotes_on}}
+        return decide_run_content(cfg, history, today=today or date(2026, 9, 12))
+
+    def test_quote_slot_when_no_quote_today(self):
+        history = {"quotes_posted": [], "posted": []}
+        self.assertEqual(self._decide(history), "quote")
+
+    def test_movie_slot_after_quote_today(self):
+        history = {
+            "quotes_posted": [{"posted_at": "2026-09-12T10:00:00+00:00"}],
+            "posted": [],
+        }
+        self.assertEqual(self._decide(history), "movie")
+
+    def test_none_slot_when_both_posted_today(self):
+        history = {
+            "quotes_posted": [{"posted_at": "2026-09-12T10:00:00+00:00"}],
+            "posted": [{"status": "published", "posted_at": "2026-09-12T11:00:00+00:00"}],
+        }
+        self.assertEqual(self._decide(history), "none")
+
+    def test_movie_slot_when_quotes_disabled(self):
+        history = {"quotes_posted": [], "posted": []}
+        self.assertEqual(self._decide(history, quotes_on=False), "movie")
+
+    def test_quote_slot_in_hisown_day(self):
+        history = {
+            "quotes_posted": [{"posted_at": "2026-09-10T10:00:00+00:00"}],
+            "posted": [],
+        }
+        today = date(2026, 9, 12)
+        self.assertEqual(self._decide(history, today=today), "quote",
+                         "نقل‌قول دیروز نباید امروز را مسدود کند")
 
 
 class DailyQuotePublishTest(unittest.TestCase):

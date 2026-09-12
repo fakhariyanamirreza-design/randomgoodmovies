@@ -47,29 +47,6 @@ class TelegramPublisher:
             print(f"[DRY-RUN] photo_url: {photo_url}")
             return {"ok": True, "dry_run": True}
 
-        return self._post(f"https://api.telegram.org/bot{self.bot_token}/sendPhoto", payload)
-
-    def send_message(self, text, dry_run=False):
-        """ارسال پیام متنی (بدون عکس). برای لینک یوتیوب، تلگرام به‌صورت خودکار
-        کارت ویدیوی پخش‌شدنی داخلِ پیام (inline player) می‌سازد."""
-        if not text:
-            raise TelegramPublishError("متن پیام خالی است.")
-
-        url = f"https://api.telegram.org/bot{self.bot_token}/sendMessage"
-        payload = {
-            "chat_id": self.channel_id,
-            "text": text,
-            "parse_mode": self.parse_mode,
-        }
-
-        if dry_run:
-            print("[DRY-RUN] ارسال پیام متنی شبیه‌سازی شد (چیزی ارسال نشد).")
-            print(f"[DRY-RUN] text:\n{text}")
-            return {"ok": True, "dry_run": True}
-
-        return self._post(url, payload)
-
-    def _post(self, url, payload):
         last_error = None
         for attempt in range(self.max_retries + 1):
             try:

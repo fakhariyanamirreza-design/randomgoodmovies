@@ -10,7 +10,7 @@ Discover → Filter → Score → Analyze History → Select → Choose Angle �
 
 import os
 import sys
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 
 from src.angles import AngleEngine
 from src.content import ContentBuilder
@@ -135,112 +135,55 @@ def build_attempt(client, angles, content, quality, cand, reasons=None, today=No
     except Exception:
         similar = []
 
+    trailer_url = None
+    try:
+        trailer_key = client.movie_trailer(cand.get("tmdb_id"))
+        if trailer_key:
+            trailer_url = f"https://www.youtube.com/watch?v={trailer_key}"
+    except Exception:
+        trailer_url = None
+
     caption = content.build(cand, angle_decision, keywords, director_en, director_imdb_id,
-                            similar=similar, reasons=reasons)
+                            similar=similar, reasons=reasons, trailer_url=trailer_url)
     return caption, angle_decision, keywords
 
 
-def trailer_post_link(config, message_id):
-    """لینک مستقیم پستِ تریلهرونده: t.me/<handle>/<message_id> (مناسب کانال عمومی)."""
-    handle = config.get("trailer", {}).get("channel_handle")
-    if not handle:
-        cid = str(os.environ.get("TELEGRAM_CHANNEL_ID", "")).strip()
-        if cid.startswith("@"):
-            handle = cid[1:]
-        elif cid.isdigit():
-            number = cid.lstrip("-100")
-            handle = f"c/{number}"
-        else:
-            handle = ""
-    return f"https://t.me/{handle}/{message_id}" if handle else ""
-
-
-def build_trailer_caption(config, entry, trailer_key, post_link):
-    """متن پست تریلر: نام فیلم، لینک پست معرفی، لینک خام یوتیوب (برای پخش inline) و footer."""
-    tcfg = config.get("trailer", {})
-    footer = config.get("posting", {}).get("channel_footer") or ""
-    template = tcfg.get("caption") or [
-        "🎬 تریلر فیلم {title_fa}",
-        "",
-        "📄 پست معرفی فیلم: {post_link}",
-        "",
-        "{trailer_url}",
-        "",
-        "{footer}",
-    ]
-    values = {
-        "title_fa": entry.get("title_fa") or entry.get("title") or "",
-        "title_en": entry.get("title_en") or "",
-        "post_link": (f"<a href='{post_link}'>مشاهده پست</a>" if post_link else "در دسترس نیست"),
-        # لینک خام و جداگانه؛ تلگرام به این URL یک کارت ویدیوی پخش‌شدنی inline ضمیمه می‌کند
-        "trailer_url": f"https://www.youtube.com/watch?v={trailer_key}",
-        "footer": footer,
-    }
-    lines = []
-    for line in template:
-        if line == "":
-            lines.append("")
-            continue
+def quote_posted_today(history, today):
+    """آیا امروز نقل‌قولی منتشر شده؟"""
+    for item in history.get("quotes_posted", []):
         try:
-            rendered = line.format(**values)
-        except (KeyError, IndexError, ValueError):
-            continue
-        lines.append(rendered)
-    return "\n".join(lines).strip()
-
-
-def publish_pending_trailers(client, publisher, config, history, now=None):
-    """تری‌لر پست‌های قدیمی‌تر از `after_days` روز را به‌صورت پست جدا منتشر می‌کند.
-
-    تاریخچه را درجا آپدیت می‌کند (trailer_posted_at / trailer_skipped)؛ ذخیره با caller.
-    برمی‌گرداند تعداد تری‌لرِ منتشرشده.
-    """
-    tcfg = config.get("trailer", {})
-    if not tcfg.get("enabled", True):
-        return 0
-    after_days = int(tcfg.get("after_days", 1))
-    max_per_run = int(tcfg.get("max_per_run", 1))
-    dry_run = bool(config.get("posting", {}).get("dry_run", False))
-    now = now or datetime.now(timezone.utc)
-
-    pending = []
-    for entry in history.get("posted", []):
-        if entry.get("status") != "published" or not entry.get("message_id"):
-            continue
-        if entry.get("trailer_posted_at") or entry.get("trailer_skipped"):
-            continue
-        posted_at = None
-        try:
-            posted_at = datetime.fromisoformat(entry.get("posted_at", ""))
+            posted = datetime.fromisoformat(str(item.get("posted_at", "")))
+            if posted.date() == today:
+                return True
         except (ValueError, TypeError):
             continue
-        if posted_at and posted_at.tzinfo is None:
-            posted_at = posted_at.replace(tzinfo=timezone.utc)
-        if posted_at and now - posted_at >= timedelta(days=after_days):
-            pending.append(entry)
+    return False
 
-    published = 0
-    for entry in pending[:max_per_run]:
-        trailer_key = client.movie_trailer(entry.get("id"))
-        if not trailer_key:
-            entry["trailer_skipped"] = "no_trailer"
+
+def movie_posted_today(history, today):
+    """آیا امروز فیلمی منتشر شده؟"""
+    for entry in history.get("posted", []):
+        if entry.get("status") != "published":
             continue
-        caption = build_trailer_caption(config, entry, trailer_key,
-                                        trailer_post_link(config, entry.get("message_id")))
         try:
-            resp = publisher.send_message(caption, dry_run=dry_run)
-        except Exception as exc:
-            explain.eprint(f"انتشار تری‌لر به تلگرام شکست خورد: {exc}")
+            posted = datetime.fromisoformat(str(entry.get("posted_at", "")))
+            if posted.date() == today:
+                return True
+        except (ValueError, TypeError):
             continue
-        entry["trailer_posted_at"] = now.replace(microsecond=0).isoformat()
-        if isinstance(resp, dict):
-            if resp.get("dry_run"):
-                entry["trailer_message_id"] = "(dry-run)"
-            elif resp.get("result"):
-                entry["trailer_message_id"] = resp["result"].get("message_id")
-        explain.print_publish_status(True, f"تری‌لر: {entry.get('title_fa') or entry.get('title')}")
-        published += 1
-    return published
+    return False
+
+
+def decide_run_content(config, history, today=None):
+    """روتاسیون «هر اجرا فقط یک نوع پست»: اگر نقل‌قول امروز هنوز نرفته، نوبت
+    نقل‌قول است؛ وگرنه نوبت فیلم. اگر هر دو رفته‌اند، «none» برمی‌گرداند."""
+    today = today or date.today()
+    quotes_on = config.get("quotes", {}).get("enabled", True)
+    if quotes_on and not quote_posted_today(history, today):
+        return "quote"
+    if movie_posted_today(history, today):
+        return "none"
+    return "movie"
 
 
 def publish_daily_quote(client, publisher, config, history, dry_run=False, today=None):
@@ -323,14 +266,18 @@ def main():
         config,
     )
 
-    # --- Trailer posts: پست جدا برای تریلرِ پست‌های یک‌روز قدیمی‌تر ---
-    published_trailers = publish_pending_trailers(client, publisher, config, history)
-    if published_trailers:
-        save_history_safe(history, HISTORY_PATH)
-
-    # --- Daily quote: نقل قول سینمایی روزانه ---
-    if publish_daily_quote(client, publisher, config, history, dry_run=dry_run):
-        save_history_safe(history, HISTORY_PATH)
+    # --- روتاسیون: هر اجرا فقط یک نوع پست (صبح نقل‌قول، شب فیلم) ---
+    slot = decide_run_content(config, history)
+    if slot == "quote":
+        explain.print_message("نوبت این اجرا: نقل‌قول روزانه (پست فیلم به اجرای بعدی موکول شد).")
+        if publish_daily_quote(client, publisher, config, history, dry_run=dry_run):
+            save_history_safe(history, HISTORY_PATH)
+        else:
+            explain.eprint("نقل‌قول امروز منتشر نشد؛ این اجرا پستی ندارد.")
+        return
+    if slot == "none":
+        explain.print_message("امروز نقل‌قول و فیلم هر دو منتشر شده‌اند؛ این اجرا پستی ندارد.")
+        return
 
     # --- Discover ---
     candidates, _excluded, stats = discovery.discover()

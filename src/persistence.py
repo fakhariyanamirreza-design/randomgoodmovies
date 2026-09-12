@@ -1,5 +1,6 @@
 """پایداری تاریخچه و memory روی JSON با schema سازگار و ارتقاپذیر."""
 
+import copy
 import os
 import json
 
@@ -10,8 +11,8 @@ def load_json(path, default):
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
         except (ValueError, OSError):
-            return dict(default)
-    return dict(default)
+            return copy.deepcopy(default)
+    return copy.deepcopy(default)
 
 
 def save_json(path, data):
