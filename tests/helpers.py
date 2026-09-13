@@ -24,14 +24,15 @@ def base_config():
         "scoring": {
             "weights": {
                 "quality": 0.27,
-                "novelty": 0.15,
+                "novelty": 0.12,
                 "category_diversity": 0.10,
                 "genre_diversity": 0.10,
                 "director_diversity": 0.10,
-                "era_diversity": 0.08,
-                "popularity": 0.09,
+                "era_diversity": 0.10,
+                "popularity": 0.06,
                 "surprise": 0.04,
-                "trending": 0.07,
+                "trending": 0.05,
+                "classic": 0.06,
             },
             "quality_max": 100,
             "quality_vote_count_reference": 5000,
@@ -39,6 +40,8 @@ def base_config():
             "popularity_max": 100,
             "popularity_reference": 100,
             "surprise_vote_count_threshold": 3000,
+            "classic_min_age": 10,
+            "classic_max_age": 20,
         },
         "weighted_selection": {
             "enabled": False,  # تست‌ها deterministic

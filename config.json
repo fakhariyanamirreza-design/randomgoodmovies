@@ -1,6 +1,5 @@
 {
   "_help": "Autonomous Movie Content System - تمام تنظیمات قابل تغییر این‌جا قرار دارند. در این نسخه هیچ LLM یا سرویس پولی استفاده نمی‌شود؛ همه‌چیز rule-based و deterministic است.",
-
   "profiles": [
     {
       "name": "شاهکارهای کلاسیک",
@@ -44,7 +43,6 @@
       "vote_count_gte": 1000
     }
   ],
-
   "posting": {
     "telegram_parse_mode": "HTML",
     "overview_max_chars": 320,
@@ -54,13 +52,11 @@
     "verify_thumbnail_url": false,
     "dry_run": false
   },
-
   "quotes": {
     "_help": "نقل‌قول روزانه‌ی سینمایی: هر روز یک پست با عکس افقی (backdrop) از سکانس‌های فیلم + نقل قول فارسی + لینک IMDB (+ سال ساخت). نقل‌قول‌های دارای فحش/رکیک و فیلم‌های بدون عکس افقی رد می‌شوند. نام فایل: data/movie_quotes.json (ترتیب فایل = ترتیب اولویت).",
     "enabled": true,
     "daily_cap": 1
   },
-
   "candidate_pool": {
     "target_per_profile": 8,
     "max_pages_per_profile": 3,
@@ -69,70 +65,68 @@
     "sort_by": "popularity.desc",
     "page_size": 20
   },
-
   "trending": {
     "_help": "فیلم‌های ترند روز TMDb به عنوان منبع اضافی کاندیدا (رایگان، بدون LLM). هر کاندیدای ترند وزن امتیازدهی `trending` را می‌گیرد؛ فقط 'تا حدی' روی انتخاب اثر می‌گذارد.",
     "enabled": true,
     "window": "week",
-    "limit": 12,
+    "limit": 8,
     "min_rating": 6.5,
     "min_vote_count": 500
   },
-
   "scoring": {
-    "_help": "امتیاز نهایی = مجموع (سهم هر معیار). هر معیار باید بین 0 تا max رسیده شود و سهمش در max ضرب می‌شود. وزن‌ها باید بین 0 و 1 باشند و مجموعشان 1 شود.",
+    "_help": "امتیاز نهایی = مجموع (سهم هر معیار). هر معیار باید بین 0 تا max رسیده شود و سهمش در max ضرب می‌شود. وزن‌ها باید بین 0 و 1 باشند و مجموعشان 1 شود. classic با classic_min_age/classic_max_age (سال) به فیلم‌های قدیمی بونس می‌دهد تا در برابر فیلم‌های به‌روز تعادل باشد.",
     "weights": {
       "quality": 0.27,
-      "novelty": 0.15,
-      "category_diversity": 0.10,
-      "genre_diversity": 0.10,
-      "director_diversity": 0.10,
-      "era_diversity": 0.08,
-      "popularity": 0.09,
+      "novelty": 0.12,
+      "category_diversity": 0.1,
+      "genre_diversity": 0.1,
+      "director_diversity": 0.1,
+      "era_diversity": 0.1,
+      "popularity": 0.06,
       "surprise": 0.04,
-      "trending": 0.07
+      "trending": 0.05,
+      "classic": 0.06
     },
     "quality_max": 100,
     "quality_vote_count_reference": 5000,
     "rating_reference_max": 10,
     "popularity_max": 100,
     "popularity_reference": 100,
-    "surprise_vote_count_threshold": 3000
+    "surprise_vote_count_threshold": 3000,
+    "classic_min_age": 10,
+    "classic_max_age": 20
   },
-
   "weighted_selection": {
     "_help": "به‌جای همیشه انتخاب بالاترین امتیاز، از Top-N با احتمال وزن‌دار بر اساس امتیاز انتخاب می‌شود تا تنوع حفظ شود.",
     "enabled": true,
     "top_n": 3,
     "temperature": 1.2
   },
-
   "diversity": {
-"_help": "محدودیت‌های انعطاف‌پذیر انتخاب نهایی و پنجره‌های تاریخچه. hard_limit ها اول اعمال می‌شوند؛ اگر هیچ فیلمی باقی نماند soft_limit ها اعمال می‌شوند. max_consecutive=1 یعنی فیلم پشت‌سرهمِ همدسته/هم‌ژانر منتشر نشود.",
-      "history_window": 10,
-      "recent_window": 5,
-      "category": {
-        "hard_limit": 1,
-        "soft_limit": 1,
-        "max_consecutive": 1
-      },
-      "genre": {
-        "hard_limit": 2,
-        "soft_limit": 1,
-        "max_consecutive": 1
-      },
-      "director": {
-        "hard_limit": 2,
-        "soft_limit": 1,
-        "max_consecutive": 2
-      },
-      "era": {
-        "hard_limit": 3,
-        "soft_limit": 2,
-        "max_consecutive": 2
-      }
+    "_help": "محدودیت‌های انعطاف‌پذیر انتخاب نهایی و پنجره‌های تاریخچه. hard_limit ها اول اعمال می‌شوند؛ اگر هیچ فیلمی باقی نماند soft_limit ها اعمال می‌شوند. max_consecutive=1 یعنی فیلم پشت‌سرهمِ همدسته/هم‌ژانر منتشر نشود.",
+    "history_window": 10,
+    "recent_window": 5,
+    "category": {
+      "hard_limit": 1,
+      "soft_limit": 1,
+      "max_consecutive": 1
+    },
+    "genre": {
+      "hard_limit": 2,
+      "soft_limit": 1,
+      "max_consecutive": 1
+    },
+    "director": {
+      "hard_limit": 2,
+      "soft_limit": 1,
+      "max_consecutive": 2
+    },
+    "era": {
+      "hard_limit": 3,
+      "soft_limit": 2,
+      "max_consecutive": 2
+    }
   },
-
   "angles": {
     "_help": "هر angle یک قانون rule-based برای انتخاب دارد؛ template آن اگر تعریف نشود از content.default_template استفاده می‌شود.",
     "priority": [
@@ -170,8 +164,16 @@
       "award_recognition": {
         "known_awards_exist": true,
         "award_keywords": [
-          "oscar", "academy award", "cannes", "palme d'or", "bafta",
-          "golden globe", "venice", "berlinale", "grand prix", "academy award winner"
+          "oscar",
+          "academy award",
+          "cannes",
+          "palme d'or",
+          "bafta",
+          "golden globe",
+          "venice",
+          "berlinale",
+          "grand prix",
+          "academy award winner"
         ]
       },
       "modern_classic": {
@@ -200,7 +202,6 @@
     },
     "default_angle": "genre_recommendation"
   },
-
   "content": {
     "_help": "یک قالب استاندارد (genre_recommendation) برای همه‌ی angleها؛ چیدمان یکدستِ هدر و بدنه (ایده‌ی ۵). بلاک‌ها: title_fa,title_en,tagline,trending_line,occasion_line,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,audience_line,trailer_line,hashtags,footer. 'blank' خط خالی است. ایموجی ژانر (ایده ۱)، هشتگ سبک/ساختارمند (ایده ۴) و مخاطب‌شناس (ایده ۷) از همین بخش قابل تنظیم‌اند. trailer_line لینک تریلر یوتیوب (از /movie/{id}/videos) را داخل کپشن معرفی فیلم می‌گذارد؛ اگر تریلری نبود خودکار حذف می‌شود.",
     "max_caption_chars": 1024,
@@ -208,23 +209,44 @@
     "default_template": "genre_recommendation",
     "hashtag_mode": "structured",
     "genre_emoji": {
-      "28": "💥", "12": "🗺️", "16": "🧸", "35": "😂", "80": "🕵️",
-      "99": "🎞️", "18": "🎭", "10751": "👨‍👩‍👧", "14": "🐉", "36": "🕰️",
-      "27": "👻", "10402": "🎶", "9648": "🧩", "10749": "💘", "878": "👽",
-      "10770": "📺", "53": "😱", "10752": "⚔️", "37": "🤠"
+      "28": "💥",
+      "12": "🗺️",
+      "16": "🧸",
+      "35": "😂",
+      "80": "🕵️",
+      "99": "🎞️",
+      "18": "🎭",
+      "10751": "👨‍👩‍👧",
+      "14": "🐉",
+      "36": "🕰️",
+      "27": "👻",
+      "10402": "🎶",
+      "9648": "🧩",
+      "10749": "💘",
+      "878": "👽",
+      "10770": "📺",
+      "53": "😱",
+      "10752": "⚔️",
+      "37": "🤠"
     },
     "genre_emoji_default": "🎬",
     "templates": {
       "genre_recommendation": [
-        "title_fa", "title_en",
+        "title_fa",
+        "title_en",
         "blank",
         "tagline",
         "trending_line",
         "occasion_line",
         "blank",
-        "category", "rating", "genres", "runtime", "country",
+        "category",
+        "rating",
+        "genres",
+        "runtime",
+        "country",
         "blank",
-        "director_fa", "director_en",
+        "director_fa",
+        "director_en",
         "blank",
         "overview",
         "blank",
@@ -259,7 +281,6 @@
       "footer": "{footer}"
     }
   },
-
   "quality_gate": {
     "require_overview": true,
     "require_poster": true,
@@ -268,14 +289,12 @@
     "require_imdb_when_available": false,
     "max_caption_chars": 1024
   },
-
   "publisher": {
     "photo_size": "w1280",
     "timeout_seconds": 30,
     "max_retries": 2,
     "rate_limit_sleep_seconds": 1.0
   },
-
   "tmdb": {
     "base_url": "https://api.themoviedb.org/3",
     "request_timeout": 20,

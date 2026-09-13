@@ -4,6 +4,9 @@
 خروجی تا «سهم هر معیار» قابل توضیح (explainable) است.
 """
 
+from datetime import date
+
+
 def _clamp(x, lo=0.0, hi=1.0):
     return max(lo, min(hi, x))
 
@@ -95,6 +98,31 @@ def trending_component(cand, _cfg):
     return 1.0 if cand.get("trending") else 0.0
 
 
+def classic_component(cand, cfg):
+    """کلاسیک بودن: هرچه فیلم قدیمی‌تر، سهم بیشتر (تا سقف classic_max_age).
+
+    با آن‌که era_diversity «تکرار یک دهه» را جریمه می‌کند، فیلم‌های به‌روز به خاطر
+    popularity/trending/quality بالا برنده می‌شدند؛ این معیار به فیلم‌های قدیمی بونس
+    صریح می‌دهد تا تعادل برقرار شود. بدون year سهم 0 است.
+    """
+    year = cand.get("year")
+    if not year:
+        return 0.0
+    try:
+        age = date.today().year - int(year)
+    except (TypeError, ValueError):
+        return 0.0
+    min_age = cfg.get("classic_min_age", 10)
+    max_age = cfg.get("classic_max_age", 20)
+    if max_age <= min_age:
+        return 1.0 if age >= min_age else 0.0
+    if age <= min_age:
+        return 0.0
+    if age >= max_age:
+        return 1.0
+    return (age - min_age) / (max_age - min_age)
+
+
 COMPONENTS = {
     "quality": quality_component,
     "novelty": novelty_component,
@@ -105,6 +133,7 @@ COMPONENTS = {
     "popularity": popularity_component,
     "surprise": surprise_component,
     "trending": trending_component,
+    "classic": classic_component,
 }
 
 DEFAULTS = {
@@ -115,6 +144,7 @@ DEFAULTS = {
     "popularity_reference": 100,
     "surprise_vote_count_threshold": 3000,
     "trending_max": 100,
+    "classic_max": 100,
 }
 
 
@@ -129,7 +159,7 @@ class ScoringEngine:
         """امتیاز یک کاندیدا + تفکیک هر معیار (برای explainability)."""
         breakdown = {}
         total = 0.0
-        cfg_needing = {"quality", "popularity", "surprise", "trending"}
+        cfg_needing = {"quality", "popularity", "surprise", "trending", "classic"}
         for name, weight in self.weights.items():
             max_val = DEFAULTS.get(name + "_max", 100.0)
             func = COMPONENTS.get(name)

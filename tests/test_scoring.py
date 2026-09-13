@@ -60,6 +60,14 @@ class ScoringTests(unittest.TestCase):
         self.assertGreater(b_tr.get("trending", 0), 0)
         self.assertEqual(b_no.get("trending", 0), 0)
 
+    def test_classic_boost_for_older_films(self):
+        old = make_candidate(year=1994, tmdb_id=20)
+        new = make_candidate(year=2026, tmdb_id=21)
+        _, b_old = self.engine.score_one(old)
+        _, b_new = self.engine.score_one(new)
+        self.assertGreater(b_old.get("classic", 0), 0)
+        self.assertEqual(b_new.get("classic", 0), 0)
+
     def test_ranked_sorted_desc(self):
         c1 = make_candidate(rating=9.0, vote_count=9000, tmdb_id=1, title_fa="A")
         c2 = make_candidate(rating=6.0, vote_count=50, tmdb_id=2, title_fa="B")
