@@ -29,7 +29,7 @@ SAMPLE_QUOTES = [
     {
         "movie": "Aliens",
         "imdb_url": "https://www.imdb.com/title/tt0090605/",
-        "quote": "Get away from her!",
+        "quote": "Get away from her, you bitch!",
         "quote_fa": "ازش دور شو، مادرسگ!",
     },
 ]
@@ -80,19 +80,21 @@ class QuoteEngineTests(unittest.TestCase):
         self.assertEqual(index, 1)
         self.assertEqual(quote["movie"], "Joker")
 
-        # بعد از انتشار جکر، چیزی باقی نمی‌ماند (Aliens فحش دارد)
+        # بعد از انتشار جکر، چیزی باقی نمی‌ماند (Aliens در متن انگلیسی فحش دارد)
         qe.record_published(1)
         self.assertEqual(qe.next_quote(), (None, None))
 
     def test_build_caption(self):
         qe = self._engine()
         caption = qe.build_caption(SAMPLE_QUOTES[0], "📢 عضویت در کانال: @test", year=1994)
-        self.assertIn("«امید چیز خوبی است.»", caption)
+        # از این به بعد متن اصلی انگلیسی نقل قول منتشر می‌شود
+        self.assertIn("«Hope is a good thing.»", caption)
+        self.assertNotIn("امید چیز خوبی است", caption)
         self.assertIn("The Shawshank Redemption (1994)", caption)
         self.assertIn("https://www.imdb.com/title/tt0111161/", caption)
         self.assertIn("@test", caption)
         # ترتیب بلاک‌ها: نقل قول → نام فیلم → footer
-        self.assertLess(caption.index("«امید"), caption.index("The Shawshank"))
+        self.assertLess(caption.index("«Hope"), caption.index("The Shawshank"))
         self.assertLess(caption.index("The Shawshank"), caption.index("@test"))
 
     def test_build_caption_without_year(self):
@@ -100,6 +102,14 @@ class QuoteEngineTests(unittest.TestCase):
         caption = qe.build_caption(SAMPLE_QUOTES[1], "footer", year=None)
         self.assertIn("Joker</a>", caption)
         self.assertNotIn("(", caption)
+
+    def test_build_caption_falls_back_to_fa(self):
+        qe = self._engine()
+        entry = {"movie": "X",
+                 "imdb_url": "https://www.imdb.com/title/tt0000000/",
+                 "quote": "", "quote_fa": "نقل قول تست."}
+        caption = qe.build_caption(entry, "footer")
+        self.assertIn("«نقل قول تست.»", caption)
 
     def test_record_published_and_get_published(self):
         qe = self._engine()

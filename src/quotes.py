@@ -60,7 +60,7 @@ class QuoteEngine:
         for i, quote in enumerate(self.quotes):
             if i in published:
                 continue
-            if contains_profanity(quote.get("quote_fa", "")):
+            if contains_profanity(quote.get("quote", "")) or contains_profanity(quote.get("quote_fa", "")):
                 continue
             return i, quote
         return None, None
@@ -80,11 +80,11 @@ class QuoteEngine:
         """ساخت کپشن پست نقل قول. اگر year داده شود کنار نام فیلم می‌آید."""
         movie_name = quote.get("movie", "")
         imdb_url = quote.get("imdb_url", "")
-        quote_fa = quote.get("quote_fa", "")
+        quote_en = quote.get("quote", "") or quote.get("quote_fa", "")
         movie_label = f"{movie_name} ({year})" if year else movie_name
 
         lines = [
-            f"«{quote_fa}»",
+            f"«{quote_en}»",
             "",
             f"<a href=\"{imdb_url}\">{movie_label}</a>",
             "",
