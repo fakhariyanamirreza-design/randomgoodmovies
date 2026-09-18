@@ -64,6 +64,10 @@ def record_history(history, cand, breakdown, total, angle_decision, caption, pos
         "genre_names_fa": cand.get("genre_names_fa") or [],
         "director": cand.get("director"),
         "era": cand.get("era"),
+        "rating": cand.get("rating"),
+        "vote_count": cand.get("vote_count"),
+        "popularity": cand.get("popularity"),
+        "imdb_id": cand.get("imdb_id"),
         "posted_at": datetime.now(timezone.utc).isoformat(),
         "selected_score": round(total, 2),
         "score_breakdown": {k: round(v, 2) for k, v in breakdown.items()},
@@ -174,10 +178,12 @@ def movie_posted_today(history, today):
     return False
 
 
-def decide_run_content(config, history, today=None):
-    """روتاسیون «هر اجرا فقط یک نوع پست»: اگر نقل‌قول امروز هنوز نرفته، نوبت
-    نقل‌قول است؛ وگرنه نوبت فیلم. اگر هر دو رفته‌اند، «none» برمی‌گرداند."""
+def decide_run_content(config, history, today=None, ignore_monthly=False):
+    """روتاسیون «هر اجرا فقط یک نوع پست»: اگر نوبت لیست ماهانه باشد، آن؛ وگرنه اگر
+    نقل‌قول امروز هنوز نرفته نوبت نقل‌قول است؛ وگرنه نوبت فیلم. اگر هر دو رفته‌اند «none»."""
     today = today or date.today()
+    if not ignore_monthly and monthly_list_due(config, history, today):
+        return "monthly_list"
     quotes_on = config.get("quotes", {}).get("enabled", True)
     if quotes_on and not quote_posted_today(history, today):
         return "quote"
@@ -241,6 +247,133 @@ def publish_daily_quote(client, publisher, config, history, dry_run=False, today
     return True
 
 
+def shift_month(d, delta):
+    """جابه‌جایی ماه: می‌گیرد date، برمی‌گرداند رشته‌ی 'YYYY-MM'."""
+    raw = d.year * 12 + d.month - 1 + delta
+    return f"{raw // 12:04d}-{raw % 12 + 1:02d}"
+
+
+def monthly_target_month(today, months_back):
+    return shift_month(today, -max(int(months_back or 1), 0))
+
+
+def monthly_list_due(config, history, today=None):
+    """لیست ماهانه فقط در «اولین اجرای ماه» (زمانی که لیستِ ماهِ هدف هنوز ثبت نشده)."""
+    today = today or date.today()
+    ml = config.get("monthly_list", {}) or {}
+    if not ml.get("enabled", False):
+        return False
+    target = monthly_target_month(today, ml.get("months_back", 1))
+    posted = {item.get("year_month") for item in history.get("monthly_lists", []) if item.get("year_month")}
+    return target not in posted
+
+
+def editorial_metric(entry, ml):
+    """امتیاز editorial یک پست قبلی: rating+vote_count (یا fallback به selected_score)."""
+    rating = entry.get("rating")
+    vote_count = entry.get("vote_count")
+    if rating is not None:
+        rw = float(ml.get("rating_weight", 0.7))
+        vw = float(ml.get("vote_weight", 0.3))
+        ref = float(ml.get("vote_count_reference", 5000))
+        rating_share = max(0.0, min(float(rating) / 10, 1.0))
+        votes_share = max(0.0, min(float(vote_count or 0) / ref, 1.0))
+        return rw * rating_share + vw * votes_share
+    score = entry.get("selected_score")
+    if score is not None:
+        return 0.7 * max(0.0, min(float(score) / 100, 1.0))
+    return 0.0
+
+
+def _parse_posted_at(item):
+    try:
+        return datetime.fromisoformat(str(item.get("posted_at", "")))
+    except (ValueError, TypeError):
+        return None
+
+
+def build_monthly_list_caption(config, top_entries, title=None, channel=None):
+    """پست واحد «۱۰ فیلم برتر ماه گذشته»: لیست شماره‌دار + لینک به پست قبلی (در صورت امکان)."""
+    ml = config.get("monthly_list", {}) or {}
+    caption_lines = [f"<b>{title or ml.get('title', '۱۰ فیلم برتر ماه گذشته')}</b> 🔝", ""]
+    handle = (channel or "").strip()
+    for i, entry in enumerate(top_entries, 1):
+        label = entry.get("title_fa") or entry.get("title_en") or "؟"
+        year = entry.get("year")
+        label = f"{label} ({year})" if year else label
+        rating = entry.get("rating")
+        star = f" ⭐ {float(rating):.1f}" if rating is not None else ""
+        message_id = entry.get("message_id")
+        if handle.startswith("@") and message_id:
+            link = f"https://t.me/{handle[1:]}/{message_id}"
+            caption_lines.append(f"{i}. <a href=\"{link}\">{label}</a>{star}")
+        else:
+            caption_lines.append(f"{i}. {label}{star}")
+    caption_lines.append("")
+    caption_lines.append(config.get("posting", {}).get("channel_footer") or "")
+    return "\n".join(caption_lines)
+
+
+def publish_monthly_list(client, publisher, config, history, dry_run=False, today=None):
+    """پست ماهانه: ۱۰ فیلم برترِ منتشرشده در ماهِ هدف + پوستر فیلم اول.
+    ثبت در history.monthly_lists به‌صورت جداگانه (نوع متمایز، نه posted)."""
+    ml = config.get("monthly_list", {}) or {}
+    if not ml.get("enabled", False):
+        return False
+
+    today = today or date.today()
+    target = monthly_target_month(today, ml.get("months_back", 1))
+    size = int(ml.get("size", 10))
+
+    month_entries = []
+    for entry in history.get("posted", []):
+        if entry.get("status") != "published":
+            continue
+        posted = _parse_posted_at(entry)
+        if posted and posted.strftime("%Y-%m") == target:
+            month_entries.append(entry)
+
+    if not month_entries:
+        explain.eprint("لیست ماهانه: هیچ فیلمی در ماه هدف منتشر نشده بود.")
+        return False
+
+    scored = [(editorial_metric(e, ml), e) for e in month_entries]
+    scored.sort(key=lambda x: (-x[0], _parse_posted_at(x[1]) or datetime.min, x[1].get("title", "")))
+    top = [e for _, e in scored[:size]]
+
+    poster_path = next((e.get("poster") for e in top if e.get("poster")), None)
+    if not poster_path:
+        explain.eprint("لیست ماهانه: هیچ پوستری در لیست برترها نبود.")
+        return False
+
+    caption = build_monthly_list_caption(
+        config, top,
+        channel=os.environ.get("TELEGRAM_CHANNEL_ID", ""))
+
+    try:
+        resp = publisher.send_photo(caption, poster_path, dry_run=dry_run)
+    except Exception as exc:
+        explain.eprint(f"انتشار لیست ماهانه شکست خورد: {exc}")
+        return False
+
+    message_id = None
+    if isinstance(resp, dict):
+        if resp.get("dry_run"):
+            message_id = "(dry-run)"
+        elif resp.get("result"):
+            message_id = resp["result"].get("message_id")
+
+    history.setdefault("monthly_lists", []).append({
+        "type": "monthly_list",
+        "year_month": target,
+        "posted_at": datetime.now(timezone.utc).isoformat(),
+        "message_id": message_id,
+        "count": len(top),
+    })
+    explain.print_publish_status(True, f"لیست ماهانه: {target} ({len(top)} فیلم)")
+    return True
+
+
 def main():
     get_env_or_exit()
 
@@ -266,8 +399,15 @@ def main():
         config,
     )
 
-    # --- روتاسیون: هر اجرا فقط یک نوع پست (صبح نقل‌قول، شب فیلم) ---
+    # --- روتاسیون: هر اجرا فقط یک نوع پست (صبح نقل‌قول، شب فیلم؛ اول لیست ماهانه) ---
     slot = decide_run_content(config, history)
+    if slot == "monthly_list":
+        explain.print_message("نوبت این اجرا: لیست ماهانه (پست فیلم/نقل‌قول به اجرای بعدی موکول شد).")
+        if publish_monthly_list(client, publisher, config, history, dry_run=dry_run):
+            save_history_safe(history, HISTORY_PATH)
+            return
+        explain.eprint("لیست ماهانه منتشر نشد؛ ادامه با روتاسیون عادی.")
+        slot = decide_run_content(config, history, ignore_monthly=True)
     if slot == "quote":
         explain.print_message("نوبت این اجرا: نقل‌قول روزانه (پست فیلم به اجرای بعدی موکول شد).")
         if publish_daily_quote(client, publisher, config, history, dry_run=dry_run):

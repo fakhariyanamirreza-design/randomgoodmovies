@@ -28,6 +28,7 @@ def save_json(path, data):
 DEFAULT_HISTORY = {
     "schema_version": 2,
     "posted": [],
+    "monthly_lists": [],
     "meta": {
         "performance": {
             "enabled": False,
@@ -41,6 +42,8 @@ def load_history(path):
     data = load_json(path, DEFAULT_HISTORY)
     if "posted" not in data:
         data["posted"] = []
+    if "monthly_lists" not in data:
+        data["monthly_lists"] = []
     if "meta" not in data:
         data["meta"] = {}
     if "performance" not in data["meta"]:
@@ -66,6 +69,10 @@ def normalize_entries(data):
         item.setdefault("director", None)
         item.setdefault("era", None)
         item.setdefault("year", None)
+        item.setdefault("rating", None)
+        item.setdefault("vote_count", None)
+        item.setdefault("popularity", None)
+        item.setdefault("imdb_id", None)
         item.setdefault("selected_score", None)
         item.setdefault("score_breakdown", {})
         item.setdefault("editorial_angle", None)

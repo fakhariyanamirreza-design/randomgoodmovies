@@ -22,6 +22,9 @@ class QualityGate:
         self.cfg = config.get("quality_gate", {})
         self.content_max = config.get("content", {}).get("max_caption_chars", 1024) or \
             self.cfg.get("max_caption_chars", 1024)
+        # حد سختِ «بعد از رندر کامل» — جدا از بودجه‌ی کوتاه‌سازی ساخت
+        self.max_caption_length = config.get("content", {}).get("max_caption_length", 1800) or \
+            config.get("monthly_list", {}).get("max_caption_length", 1800)
 
     def validate_metadata(self, cand):
         errors = []
@@ -60,6 +63,8 @@ class QualityGate:
             errors.append("کپشن خالی است")
         if len(caption) > self.content_max:
             errors.append(f"کپشن از حد {self.content_max} کاراکتر بیشتر است")
+        if len(caption) > self.max_caption_length:
+            errors.append(f"کپشن نهایی پس از رندر از حد {self.max_caption_length} کاراکتر بیشتر است")
         return errors
 
     def check(self, cand, caption=None):

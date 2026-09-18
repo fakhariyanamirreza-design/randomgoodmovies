@@ -77,15 +77,15 @@
     "_help": "امتیاز نهایی = مجموع (سهم هر معیار). هر معیار باید بین 0 تا max رسیده شود و سهمش در max ضرب می‌شود. وزن‌ها باید بین 0 و 1 باشند و مجموعشان 1 شود. classic با classic_min_age/classic_max_age (سال) به فیلم‌های قدیمی بونس می‌دهد تا در برابر فیلم‌های به‌روز تعادل باشد.",
     "weights": {
       "quality": 0.27,
-      "novelty": 0.12,
-      "category_diversity": 0.1,
-      "genre_diversity": 0.1,
-      "director_diversity": 0.1,
-      "era_diversity": 0.1,
-      "popularity": 0.06,
-      "surprise": 0.04,
+      "novelty": 0.16,
+      "category_diversity": 0.08,
+      "genre_diversity": 0.09,
+      "director_diversity": 0.09,
+      "era_diversity": 0.09,
+      "popularity": 0.05,
+      "surprise": 0.07,
       "trending": 0.05,
-      "classic": 0.06
+      "classic": 0.05
     },
     "quality_max": 100,
     "quality_vote_count_reference": 5000,
@@ -128,7 +128,7 @@
     }
   },
   "angles": {
-    "_help": "هر angle یک قانون rule-based برای انتخاب دارد؛ template آن اگر تعریف نشود از content.default_template استفاده می‌شود.",
+    "_help": "هر angle یک قانون rule-based برای انتخاب دارد؛ template آن اگر تعریف نشود از content.default_template استفاده می‌شود. weekend_recommendation فقط جمعه/شنبه فعال است و mood_based فیلم‌های حال‌خوب‌ساز (کمدی/عاشقانه/خانوادگی/انیمیشن) را پوشش می‌دهد.",
     "priority": [
       "trending_now",
       "release_anniversary",
@@ -141,9 +141,10 @@
       "classic_recommendation",
       "short_runtime",
       "influential_film",
+      "weekend_recommendation",
       "decade_recommendation",
       "genre_recommendation",
-      "weekend_recommendation"
+      "mood_based"
     ],
     "rules": {
       "trending_now": {},
@@ -197,14 +198,28 @@
         "min_rating": 7.8
       },
       "weekend_recommendation": {
-        "min_rating": 7.5
+        "min_rating": 7.5,
+        "weekend_days": [
+          4,
+          5
+        ]
+      },
+      "mood_based": {
+        "min_rating": 7.5,
+        "genres": [
+          35,
+          10749,
+          10751,
+          16
+        ]
       }
     },
     "default_angle": "genre_recommendation"
   },
   "content": {
-    "_help": "یک قالب استاندارد (genre_recommendation) برای همه‌ی angleها؛ چیدمان یکدستِ هدر و بدنه (ایده‌ی ۵). بلاک‌ها: title_fa,title_en,tagline,trending_line,occasion_line,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,audience_line,trailer_line,hashtags,footer. 'blank' خط خالی است. ایموجی ژانر (ایده ۱)، هشتگ سبک/ساختارمند (ایده ۴) و مخاطب‌شناس (ایده ۷) از همین بخش قابل تنظیم‌اند. trailer_line لینک تریلر یوتیوب (از /movie/{id}/videos) را داخل کپشن معرفی فیلم می‌گذارد؛ اگر تریلری نبود خودکار حذف می‌شود.",
+    "_help": "یک قالب استاندارد (genre_recommendation) به‌عنوان default؛ قالب‌های angle دیگر از همان چیدمان پیروی می‌کنند و فقط بلاک اختصاصی خودشان (weekend_line / mood_line) را اضافه می‌کنند. بلاک‌ها: title_fa,title_en,tagline,trending_line,occasion_line,weekend_line,mood_line,category,rating,genres,runtime,country,director_fa,director_en,overview,similar_movies,imdb_link,audience_line,trailer_line,hashtags,footer. 'blank' خط خالی است. max_caption_chars بودجه‌ی کوتاه‌سازی زمان ساخت است؛ max_caption_length حد سخت Quality Gate (بعد از رندر کامل) است.",
     "max_caption_chars": 1024,
+    "max_caption_length": 1800,
     "include_keywords": true,
     "default_template": "genre_recommendation",
     "hashtag_mode": "structured",
@@ -257,6 +272,62 @@
         "trailer_line",
         "blank",
         "footer"
+      ],
+      "weekend_recommendation": [
+        "title_fa",
+        "title_en",
+        "blank",
+        "weekend_line",
+        "tagline",
+        "trending_line",
+        "occasion_line",
+        "blank",
+        "category",
+        "rating",
+        "genres",
+        "runtime",
+        "country",
+        "blank",
+        "director_fa",
+        "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "similar_movies",
+        "blank",
+        "imdb_link",
+        "audience_line",
+        "trailer_line",
+        "blank",
+        "footer"
+      ],
+      "mood_based": [
+        "title_fa",
+        "title_en",
+        "blank",
+        "mood_line",
+        "tagline",
+        "trending_line",
+        "occasion_line",
+        "blank",
+        "category",
+        "rating",
+        "genres",
+        "runtime",
+        "country",
+        "blank",
+        "director_fa",
+        "director_en",
+        "blank",
+        "overview",
+        "blank",
+        "similar_movies",
+        "blank",
+        "imdb_link",
+        "audience_line",
+        "trailer_line",
+        "blank",
+        "footer"
       ]
     },
     "block_template": {
@@ -275,6 +346,8 @@
       "similar_movies": "🎯 <b>فیلم‌های شبیه به این:</b>\n{similar_movies}",
       "trending_line": "{trending_line}",
       "occasion_line": "{occasion_line}",
+      "weekend_line": "🌅 {weekend_line}",
+      "mood_line": "😌 {mood_line}",
       "audience_line": "{audience_line}",
       "trailer_line": "{trailer_line}",
       "hashtags": "{hashtags}",
@@ -288,6 +361,17 @@
     "min_rating": 6.0,
     "require_imdb_when_available": false,
     "max_caption_chars": 1024
+  },
+  "monthly_list": {
+    "_help": "پست لیست ماهانه: در اولین اجرای هر ماه، ۱۰ فیلم برترِ منتشرشده در ماه قبل بر اساس امتیاز editorial (rating/vote_count و fallback به selected_score) به‌صورت یک پست جداگانه. فقط مشاهده/ثبت جداگانه در history.monthly_lists.",
+    "enabled": false,
+    "size": 10,
+    "title": "۱۰ فیلم برتر ماه گذشته",
+    "rating_weight": 0.7,
+    "vote_weight": 0.3,
+    "vote_count_reference": 5000,
+    "months_back": 1,
+    "max_caption_length": 1800
   },
   "publisher": {
     "photo_size": "w1280",

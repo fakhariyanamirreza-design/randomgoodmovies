@@ -159,6 +159,10 @@ class ContentBuilder:
         if not why_line and reasons:
             why_line = next((r for r in reasons if r and r != "قبلاً منتشر نشده"), "")
 
+        # بلاک‌های اختصاصی زاویه (ایده ۱۲/۱۳): فقط وقتی angle متناظر انتخاب شده باشد
+        weekend_line = "پیشنهاد ویژه‌ی آخر هفته" if angle == "weekend_recommendation" else ""
+        mood_line = "فیلمی برای حال خوب و شبِ آرام" if angle == "mood_based" else ""
+
         # لینک تریلر (از /movie/{id}/videos یوتیوب) — داخل همین کپشن معرفی فیلم
         trailer_line = ""
         if trailer_url:
@@ -186,6 +190,8 @@ class ContentBuilder:
             "imdb_link": imdb_link or "",
             "similar_movies": "\n".join(similar_lines),
             "trending_line": "🔥 همین حالا در فهرست فیلم‌های ترند روز TMDb است" if cand.get("trending") else "",
+            "weekend_line": weekend_line,
+            "mood_line": mood_line,
             "hashtags": hashtags,
             "trailer_line": trailer_line,
             "footer": self.cfg.get("posting", {}).get("channel_footer") or "",
@@ -216,6 +222,8 @@ class ContentBuilder:
         "trending_line": "trending_line",
         "teaser_line": "teaser_line",
         "occasion_line": "occasion_line",
+        "weekend_line": "weekend_line",
+        "mood_line": "mood_line",
         "audience_line": "audience_line",
         "why_line": "why_line",
         "imdb_link": "imdb_link",

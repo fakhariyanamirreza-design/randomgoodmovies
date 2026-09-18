@@ -129,10 +129,22 @@ class AngleEngine:
                 else:
                     reasons.append(f"پیشنهاد بر اساس ژانر: {', '.join(cand.get('genre_names_fa') or [])}")
             elif angle == "weekend_recommendation":
-                if _rating(cand) < rule.get("min_rating", 0):
+                weekend_days = rule.get("weekend_days", [4, 5])
+                if today.weekday() not in weekend_days:
+                    ok = False
+                elif _rating(cand) < rule.get("min_rating", 0):
                     ok = False
                 else:
                     reasons.append("انتخاب مناسب تعطیلات آخر هفته")
+            elif angle == "mood_based":
+                mood_genres = rule.get("genres", [35, 10749, 10751, 16])
+                first_genre = (cand.get("genres") or [None])[0]
+                if first_genre not in mood_genres:
+                    ok = False
+                elif _rating(cand) < rule.get("min_rating", 0):
+                    ok = False
+                else:
+                    reasons.append("فیلمی برای حال خوب و شب آرام (ژانر سبک)")
 
             if ok:
                 return AngleDecision(angle, reasons)

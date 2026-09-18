@@ -56,6 +56,18 @@ class QualityGateTests(unittest.TestCase):
         result = self.gate.check(cand, caption="Some caption under 1024 chars.")
         self.assertTrue(result.passed)
 
+    def test_caption_length_gate_after_render(self):
+        # حد سختِ بعد از رندر: مستقل از بودجه‌ی ساخت (max_caption_chars)
+        cfg = base_config()
+        cfg["content"]["max_caption_length"] = 100
+        gate = QualityGate(cfg)
+        cand = make_candidate()
+        short = gate.check(cand, caption="س" * 50)
+        self.assertTrue(short.passed)
+        long = gate.check(cand, caption="س" * 150)
+        self.assertFalse(long.passed)
+        self.assertTrue(any("حد 100 کاراکتر" in e for e in long.errors))
+
 
 if __name__ == "__main__":
     unittest.main()

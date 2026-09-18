@@ -109,6 +109,58 @@ class AngleTests(unittest.TestCase):
         result = self.engine.choose(cand, keywords=[])
         self.assertEqual(result.angle, "genre_recommendation")
 
+    # -- weekend_recommendation (فقط جمعه/شنبه) و mood_based --
+
+    @staticmethod
+    def _light_candidate(**overrides):
+        # کاندیدایی که به هیچ rule قبلی نرسد (جز weekend/mood)
+        base = dict(rating=7.6, vote_count=1500, tmdb_id=500, year=2000,
+                    director=None, runtime=None, popularity=10.0,
+                    genres=[18], genre_names_fa=["درام"])
+        base.update(overrides)
+        return make_candidate(**base)
+
+    def test_weekend_recommendation_on_saturday(self):
+        cand = self._light_candidate(genres=[18])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 19))
+        self.assertEqual(result.angle, "weekend_recommendation")
+
+    def test_weekend_recommendation_on_friday(self):
+        cand = self._light_candidate(genres=[18])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 18))
+        self.assertEqual(result.angle, "weekend_recommendation")
+
+    def test_weekend_not_on_weekday(self):
+        cand = self._light_candidate(genres=[18])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 15))
+        self.assertNotEqual(result.angle, "weekend_recommendation")
+
+    def test_weekend_requires_min_rating(self):
+        cand = self._light_candidate(rating=7.0, genres=[18])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 19))
+        self.assertNotEqual(result.angle, "weekend_recommendation")
+
+    def test_mood_based_for_romance(self):
+        cand = self._light_candidate(genres=[10749], genre_names_fa=["عاشقانه"])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 15))
+        self.assertEqual(result.angle, "mood_based")
+
+    def test_mood_based_rejects_drama(self):
+        cand = self._light_candidate(genres=[18], genre_names_fa=["درام"])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 15))
+        self.assertNotEqual(result.angle, "mood_based")
+
+    def test_mood_based_requires_min_rating(self):
+        cand = self._light_candidate(rating=7.0, genres=[10749], genre_names_fa=["عاشقانه"])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 15))
+        self.assertNotEqual(result.angle, "mood_based")
+
+    def test_weekend_beats_mood_based_priority(self):
+        # کمدی با امتیاز کافی: آخر هفته اولویت بیشتری از mood_based دارد
+        cand = self._light_candidate(genres=[35], genre_names_fa=["کمدی"])
+        result = self.engine.choose(cand, keywords=[], today=date(2026, 9, 19))
+        self.assertEqual(result.angle, "weekend_recommendation")
+
 
 if __name__ == "__main__":
     unittest.main()
