@@ -1682,6 +1682,12 @@
       "movie": "Interstellar",
       "posted_at": "2026-09-21T11:06:08.887111+00:00",
       "message_id": 64
+    },
+    {
+      "quote_index": 11,
+      "movie": "Fight Club",
+      "posted_at": "2026-09-22T10:20:03.183284+00:00",
+      "message_id": 66
     }
   ],
   "monthly_lists": []
