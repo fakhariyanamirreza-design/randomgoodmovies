@@ -1836,6 +1836,12 @@
       "movie": "The Lord of the Rings: The Two Towers",
       "posted_at": "2026-09-24T10:30:47.013414+00:00",
       "message_id": 70
+    },
+    {
+      "quote_index": 14,
+      "movie": "The Lord of the Rings: The Return of the King",
+      "posted_at": "2026-09-25T10:33:57.258355+00:00",
+      "message_id": 73
     }
   ],
   "monthly_lists": []
