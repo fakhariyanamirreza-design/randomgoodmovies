@@ -1994,6 +1994,12 @@
       "movie": "Star Wars: Episode V - The Empire Strikes Back",
       "posted_at": "2026-09-27T10:44:57.361325+00:00",
       "message_id": 77
+    },
+    {
+      "quote_index": 17,
+      "movie": "Star Wars: Episode VI - Return of the Jedi",
+      "posted_at": "2026-09-28T11:59:18.847023+00:00",
+      "message_id": 79
     }
   ],
   "monthly_lists": []
