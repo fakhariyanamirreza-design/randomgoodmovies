@@ -2050,6 +2050,12 @@
       "movie": "Star Wars: Episode VI - Return of the Jedi",
       "posted_at": "2026-09-28T11:59:18.847023+00:00",
       "message_id": 79
+    },
+    {
+      "quote_index": 18,
+      "movie": "Goodfellas",
+      "posted_at": "2026-09-29T11:34:37.062810+00:00",
+      "message_id": 81
     }
   ],
   "monthly_lists": []
