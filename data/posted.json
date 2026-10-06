@@ -2332,6 +2332,12 @@
       "movie": "Terminator 2: Judgment Day",
       "posted_at": "2026-10-05T12:39:22.658042+00:00",
       "message_id": 91
+    },
+    {
+      "quote_index": 26,
+      "movie": "Alien",
+      "posted_at": "2026-10-06T12:13:26.855917+00:00",
+      "message_id": 93
     }
   ],
   "monthly_lists": []
