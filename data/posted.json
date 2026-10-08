@@ -2436,6 +2436,12 @@
       "movie": "Back to the Future",
       "posted_at": "2026-10-07T11:59:59.865145+00:00",
       "message_id": 95
+    },
+    {
+      "quote_index": 28,
+      "movie": "Jurassic Park",
+      "posted_at": "2026-10-08T12:14:22.561291+00:00",
+      "message_id": 97
     }
   ],
   "monthly_lists": []
