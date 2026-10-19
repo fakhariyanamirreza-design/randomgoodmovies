@@ -2964,6 +2964,12 @@
       "movie": "There Will Be Blood",
       "posted_at": "2026-10-18T09:53:19.268665+00:00",
       "message_id": 117
+    },
+    {
+      "quote_index": 40,
+      "movie": "The Departed",
+      "posted_at": "2026-10-19T11:15:40.574909+00:00",
+      "message_id": 118
     }
   ],
   "monthly_lists": []
