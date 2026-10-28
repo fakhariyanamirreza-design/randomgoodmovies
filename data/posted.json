@@ -3396,6 +3396,12 @@
       "movie": "The Truman Show",
       "posted_at": "2026-10-27T10:59:29.869114+00:00",
       "message_id": 133
+    },
+    {
+      "quote_index": 49,
+      "movie": "Groundhog Day",
+      "posted_at": "2026-10-28T11:38:43.857487+00:00",
+      "message_id": 135
     }
   ],
   "monthly_lists": []
