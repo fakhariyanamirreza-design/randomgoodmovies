@@ -3408,6 +3408,12 @@
       "movie": "Good Will Hunting",
       "posted_at": "2026-10-29T11:45:05.623328+00:00",
       "message_id": 136
+    },
+    {
+      "quote_index": 51,
+      "movie": "A Beautiful Mind",
+      "posted_at": "2026-10-30T11:37:49.798268+00:00",
+      "message_id": 137
     }
   ],
   "monthly_lists": []
