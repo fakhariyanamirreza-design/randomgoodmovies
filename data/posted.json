@@ -3640,6 +3640,12 @@
       "movie": "The Revenant",
       "posted_at": "2026-11-06T13:13:56.457322+00:00",
       "message_id": 147
+    },
+    {
+      "quote_index": 60,
+      "movie": "Mad Max: Fury Road",
+      "posted_at": "2026-11-07T11:55:21.227776+00:00",
+      "message_id": 149
     }
   ],
   "monthly_lists": []
