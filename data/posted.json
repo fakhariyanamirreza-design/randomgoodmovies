@@ -3756,6 +3756,12 @@
       "movie": "Top Gun",
       "posted_at": "2026-11-10T00:51:09.739942+00:00",
       "message_id": 153
+    },
+    {
+      "quote_index": 64,
+      "movie": "Rocky",
+      "posted_at": "2026-11-11T12:57:19.770170+00:00",
+      "message_id": 155
     }
   ],
   "monthly_lists": []
