@@ -3762,6 +3762,12 @@
       "movie": "Rocky",
       "posted_at": "2026-11-11T12:57:19.770170+00:00",
       "message_id": 155
+    },
+    {
+      "quote_index": 65,
+      "movie": "On the Waterfront",
+      "posted_at": "2026-11-12T13:58:52.808167+00:00",
+      "message_id": 156
     }
   ],
   "monthly_lists": []
