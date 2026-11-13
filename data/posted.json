@@ -3768,6 +3768,12 @@
       "movie": "On the Waterfront",
       "posted_at": "2026-11-12T13:58:52.808167+00:00",
       "message_id": 156
+    },
+    {
+      "quote_index": 66,
+      "movie": "Taxi Driver",
+      "posted_at": "2026-11-13T13:25:54.174987+00:00",
+      "message_id": 157
     }
   ],
   "monthly_lists": []
