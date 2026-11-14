@@ -3774,6 +3774,12 @@
       "movie": "Taxi Driver",
       "posted_at": "2026-11-13T13:25:54.174987+00:00",
       "message_id": 157
+    },
+    {
+      "quote_index": 67,
+      "movie": "The Godfather Part II",
+      "posted_at": "2026-11-14T12:30:06.336832+00:00",
+      "message_id": 158
     }
   ],
   "monthly_lists": []
