@@ -3896,6 +3896,12 @@
       "movie": "Fargo",
       "posted_at": "2026-11-18T14:33:45.933017+00:00",
       "message_id": 163
+    },
+    {
+      "quote_index": 72,
+      "movie": "The Shining",
+      "posted_at": "2026-11-19T14:40:53.120881+00:00",
+      "message_id": 165
     }
   ],
   "monthly_lists": []
