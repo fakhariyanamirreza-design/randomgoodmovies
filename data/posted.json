@@ -3946,6 +3946,12 @@
       "movie": "The Shining",
       "posted_at": "2026-11-19T14:40:53.120881+00:00",
       "message_id": 165
+    },
+    {
+      "quote_index": 73,
+      "movie": "Psycho",
+      "posted_at": "2026-11-20T14:21:41.106283+00:00",
+      "message_id": 167
     }
   ],
   "monthly_lists": []
