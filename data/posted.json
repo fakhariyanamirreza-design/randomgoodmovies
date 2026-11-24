@@ -4110,6 +4110,12 @@
       "movie": "Blade Runner",
       "posted_at": "2026-11-23T16:29:03.818263+00:00",
       "message_id": 173
+    },
+    {
+      "quote_index": 77,
+      "movie": "Blade Runner 2049",
+      "posted_at": "2026-11-24T03:27:35.236169+00:00",
+      "message_id": 174
     }
   ],
   "monthly_lists": []
