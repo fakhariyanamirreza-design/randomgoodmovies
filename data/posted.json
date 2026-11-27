@@ -4216,6 +4216,12 @@
       "movie": "E.T. the Extra-Terrestrial",
       "posted_at": "2026-11-26T01:09:27.066372+00:00",
       "message_id": 177
+    },
+    {
+      "quote_index": 80,
+      "movie": "Ghostbusters",
+      "posted_at": "2026-11-27T01:09:05.574213+00:00",
+      "message_id": 179
     }
   ],
   "monthly_lists": []
