@@ -4222,6 +4222,12 @@
       "movie": "Ghostbusters",
       "posted_at": "2026-11-27T01:09:05.574213+00:00",
       "message_id": 179
+    },
+    {
+      "quote_index": 81,
+      "movie": "The Breakfast Club",
+      "posted_at": "2026-11-28T00:41:06.021910+00:00",
+      "message_id": 180
     }
   ],
   "monthly_lists": []
